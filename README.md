@@ -18,6 +18,15 @@ After that register the provider in your app.php config
 Iemand002\Filemanager\FilemanagerServiceProvider::class,
 ```
 
+Add or edit in filesystems.php config the following disk
+```json
+        'public' => [
+            'driver' => 'local',
+            'root' => public_path(config('filemanager.uploads.webpath')),
+            'visibility' => 'public',
+        ],
+```
+
 ## Publish configuration
 The configuration file (filemanager.php)
 ```bash

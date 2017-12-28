@@ -1,4 +1,5 @@
 <?php
+
 namespace Iemand002\Filemanager\Services;
 
 use Carbon\Carbon;
@@ -6,6 +7,9 @@ use Dflydev\ApacheMimeTypes\PhpRepository;
 use Exception;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\ImageManager;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class UploadsManager
 {
@@ -15,9 +19,10 @@ class UploadsManager
     public function __construct(PhpRepository $mimeDetect, ImageManager $intervention)
     {
         $this->disk = Storage::disk(config('filemanager.uploads.storage'));
+        $this->tempFolder = public_path(config('filemanager.uploads.temp', 'temp'));
         $this->mimeDetect = $mimeDetect;
-        $this->library = config('imageupload.library', 'gd');
-        $this->quality = config('imageupload.quality', 90);
+        $this->library = config('filemanager.library', 'gd');
+        $this->quality = config('filemanager.quality', 90);
         $this->intervention = $intervention;
 
         $this->intervention->configure(['driver' => $this->library]);
@@ -46,7 +51,9 @@ class UploadsManager
 
         $subfolders = [];
         foreach (array_unique($this->disk->directories($folder)) as $subfolder) {
-            $subfolders["/$subfolder"] = basename($subfolder);
+            if (!starts_with(basename($subfolder), '_')) {
+                $subfolders["/$subfolder"] = basename($subfolder);
+            }
         }
 
         $files = [];
@@ -86,7 +93,7 @@ class UploadsManager
         $folders = explode('/', $folder);
         $build = '';
         foreach ($folders as $folder) {
-            $build .= '/'.$folder;
+            $build .= '/' . $folder;
             $crumbs[$build] = $folder;
         }
 
@@ -156,7 +163,7 @@ class UploadsManager
         $folder = $this->cleanFolder($folder);
 
         if ($this->disk->exists($folder)) {
-            return trans('filemanager::filemanager.folder_exists',['folder'=>$folder]);
+            return trans('filemanager::filemanager.folder_exists', ['folder' => $folder]);
         }
 
         return $this->disk->makeDirectory($folder);
@@ -173,7 +180,7 @@ class UploadsManager
             $this->disk->directories($folder),
             $this->disk->files($folder)
         );
-        if (! empty($filesFolders)) {
+        if (!empty($filesFolders)) {
             return trans('filemanager::filemanager.folder_must_be_empty');
         }
 
@@ -187,7 +194,7 @@ class UploadsManager
     {
         $path = $this->cleanFolder($path);
 
-        if (! $this->disk->exists($path)) {
+        if (!$this->disk->exists($path)) {
             return trans('filemanager::filemanager.file_not_exist');
         }
 
@@ -213,19 +220,19 @@ class UploadsManager
      *
      * @access public
      * @param  UploadedFile $uploadedFile
-     * @param  string       $targetFilepath
-     * @param  int          $width
-     * @param  int          $height         (default: null)
-     * @param  bool         $squared        (default: false)
-     * @return array
+     * @param  string $targetFilepath
+     * @param  int $width
+     * @param  int $height (default: null)
+     * @param  int $quality (default: null)
+     * @param  bool $squared (default: false)
      */
-    public function resizeCropImage($uploadedFile, $targetFilepath, $width, $height = null, $squared = false)
+    public function resizeCropImage($uploadedFile, $targetFilepath, $filename, $width, $height = null, $quality = null, $squared = false)
     {
-//        dd($uploadedFile);
         try {
-            $height = (! empty($height) ? $height : $width);
+            $height = (!empty($height) ? $height : $width);
+            $quality = (!empty($quality) ? $quality : $this->quality);
             $squared = (isset($squared) ? $squared : false);
-dd(phpinfo());
+
             $image = $this->intervention->make($uploadedFile);
 
             if ($squared) {
@@ -241,24 +248,30 @@ dd(phpinfo());
                 });
             }
 
-            $image->save($targetFilepath, $this->quality);
+            $tempFile = str_finish($this->tempFolder, '/') . $filename;
 
-            // Save to s3
-//            $s3_url = $this->saveToS3($image, $targetFilepath);
-return [];
-//            return [
-//                'path' => dirname($targetFilepath),
-//                'dir' => $this->getRelativePath($targetFilepath),
-//                'filename' => pathinfo($targetFilepath, PATHINFO_BASENAME),
-//                'filepath' => $targetFilepath,
-//                'filedir' => $this->getRelativePath($targetFilepath),
-//                'width' => (int) $image->width(),
-//                'height' => (int) $image->height(),
-//                'filesize' => (int) $image->filesize(),
-//                'is_squared' => (bool) $squared,
-//            ];
+            mkdir($this->tempFolder);
+            $image->save($tempFile, $quality);
+            $this->saveFile($targetFilepath, $image);
+            $this->removeTemp();
+
         } catch (Exception $e) {
             throw new \Mockery\Exception($e->getMessage());
         }
+    }
+
+    private function removeTemp()
+    {
+        $it = new RecursiveDirectoryIterator($this->tempFolder, RecursiveDirectoryIterator::SKIP_DOTS);
+        $files = new RecursiveIteratorIterator($it,
+            RecursiveIteratorIterator::CHILD_FIRST);
+        foreach ($files as $file) {
+            if ($file->isDir()) {
+                rmdir($file->getRealPath());
+            } else {
+                unlink($file->getRealPath());
+            }
+        }
+        rmdir($this->tempFolder);
     }
 }

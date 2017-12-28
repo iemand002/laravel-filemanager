@@ -5,7 +5,7 @@ namespace Iemand002\Filemanager;
 use Illuminate\Support\Facades\Facade;
 
 /**
- * @see \Collective\Html\FilemanagerBuilder
+ * @see \Iemand002\Filemanager\FilemanagerBuilder
  */
 class FilemanagerFacade extends Facade
 {

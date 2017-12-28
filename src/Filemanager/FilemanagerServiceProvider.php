@@ -40,11 +40,9 @@ class FilemanagerServiceProvider extends ServiceProvider
         include __DIR__ . '/filemanager-helpers.php';
         $this->app->make('Iemand002\Filemanager\Controllers\UploadController');
 
-//        $this->registerUploadsManager();
         $this->registerHtmlBuilder();
 
         $this->app->alias('filemanager', 'Iemand002\Filemanager\FilemangerBuilder');
-        $this->app->alias('uploadsmanager', 'Iemand002\Filemanager\Services\UploadsManager');
     }
 
     /**
@@ -55,21 +53,7 @@ class FilemanagerServiceProvider extends ServiceProvider
     protected function registerHtmlBuilder()
     {
         $this->app->singleton('filemanager', function ($app) {
-//            dd($app);
             return new FilemanagerBuilder();
-//            return new FilemanagerBuilder($app['uploadsmanager']);
-        });
-    }
-
-    /**
-     * Register the HTML builder instance.
-     *
-     * @return void
-     */
-    protected function registerUploadsManager()
-    {
-        $this->app->singleton('uploadsmanager', function ($app) {
-            return new UploadsManager(new PhpRepository(),new ImageManager());
         });
     }
 
@@ -80,6 +64,6 @@ class FilemanagerServiceProvider extends ServiceProvider
      */
     public function provides()
     {
-        return ['filemanager', 'uploadsmanager', 'Iemand002\Filemanager\FilemangerBuilder', 'Iemand002\Filemanager\Services\UploadsManager'];
+        return ['filemanager', 'Iemand002\Filemanager\FilemangerBuilder'];
     }
 }

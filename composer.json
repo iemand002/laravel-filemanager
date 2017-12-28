@@ -19,6 +19,5 @@
         "psr-4": {
             "Iemand002\\Filemanager\\": "src/Filemanager"
         }
-    },
-    "minimum-stability": "dev"
+    }
 }

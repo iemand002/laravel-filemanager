@@ -4,6 +4,7 @@ return [
     'uploads' => [
         'storage' => 'public',
         'webpath' => '/uploads', // Change in filesystem.php the root to public_path('uploads')
+        'temp' => 'temp', // temporary upload folder for image transforms
     ],
 
     // Table
@@ -32,12 +33,12 @@ return [
     ],
     'javascript_section' => 'js',
     'css_section' => 'css',
-    'pagetitle_section'=>'pagetitle',
-    'content_section'=>'content',
+    'pagetitle_section' => 'pagetitle',
+    'content_section' => 'content',
     'include_container' => 'normal', // options: normal | fluid | none
-    
+
     // Picker: trigger onchange?
-    'on_change'=>false,
+    'on_change' => false,
 
     // JQuery datatables from https://datatables.net/
     'jquery_datatables' => [
@@ -54,17 +55,19 @@ return [
     /*
    * Sizes, used to crop and create multiple size.
    *
-   * array(width, height, squared), if square set to TRUE, image will be in square
+   * array(width, height, squared, quality)
+   *  if square set to TRUE, image will be in square
+   * if quality set to NULL, the default setting from above will be used
    */
     'transforms' => [
-        'square50' => [50, 50, true],
-        'square100' => [100, 100, true],
-        'square200' => [200, 200, true],
-        'square400' => [400, 400, true],
+        'square50' => [50, 50, true, 100],
+        'square100' => [100, 100, true, null],
+        'square200' => [200, 200, true, null],
+        'square400' => [400, 400, true, null],
 
-        'size50' => [50, 50, false],
-        'size100' => [100, 100, false],
-        'size200' => [200, 200, false],
-        'size400' => [400, 400, false],
+        'size50' => [50, 50, false, null],
+        'size100' => [100, 100, false, null],
+        'size200' => [200, 200, false, null],
+        'size400' => [400, 400, false, null],
     ],
 ];

@@ -2,12 +2,16 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Schema;
 
 class CreateImageUploadTable extends Migration
 {
+    protected  $table;
+
     public function __construct()
     {
-        $this->table = Config::get('filemanager.table');
+        $this->table = Config::get('filemanager.table','uploads');
     }
 
     /**

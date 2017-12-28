@@ -33,7 +33,7 @@ class UploadController extends Controller
     {
         $folder = $request->get('folder');
         $data = $this->manager->folderInfo($folder);
-        $data['active']='filemanager';
+        $data['active'] = 'filemanager';
 
         return view('iemand002/filemanager::index', $data);
     }
@@ -55,17 +55,17 @@ class UploadController extends Controller
     public function createFolder(UploadNewFolderRequest $request)
     {
         $new_folder = $request->get('new_folder');
-        $folder = $request->get('folder').'/'.$new_folder;
+        $folder = $request->get('folder') . '/' . $new_folder;
 
         $result = $this->manager->createDirectory($folder);
 
         if ($result === true) {
             return redirect()
                 ->back()
-                ->withSuccess(trans('filemanager::filemanager.folder_created',['folder'=>$new_folder]));
+                ->withSuccess(trans('filemanager::filemanager.folder_created', ['folder' => $new_folder]));
         }
 
-        $error = $result ? : trans('filemanager::filemanager.error_creating_folder');
+        $error = $result ?: trans('filemanager::filemanager.error_creating_folder');
         return redirect()
             ->back()
             ->withErrors([$error]);
@@ -77,17 +77,19 @@ class UploadController extends Controller
     public function deleteFile(Request $request)
     {
         $del_file = $request->get('del_file');
-        $path = $request->get('folder').'/'.$del_file;
+        $path = $request->get('folder') . '/' . $del_file;
 
         $result = $this->manager->deleteFile($path);
 
         if ($result === true) {
+            $this->delFromDb($del_file, str_finish($request->get('folder'), '/'));
+
             return redirect()
                 ->back()
-                ->withSuccess(trans('filemanager::filemanager.file_deleted',['file'=>$del_file]));
+                ->withSuccess(trans('filemanager::filemanager.file_deleted', ['file' => $del_file]));
         }
 
-        $error = $result ? : trans('filemanager::filemanager.error_deleting_file');
+        $error = $result ?: trans('filemanager::filemanager.error_deleting_file');
         return redirect()
             ->back()
             ->withErrors([$error]);
@@ -99,17 +101,17 @@ class UploadController extends Controller
     public function deleteFolder(Request $request)
     {
         $del_folder = $request->get('del_folder');
-        $folder = $request->get('folder').'/'.$del_folder;
+        $folder = $request->get('folder') . '/' . $del_folder;
 
         $result = $this->manager->deleteDirectory($folder);
 
         if ($result === true) {
             return redirect()
                 ->back()
-                ->withSuccess(trans('filemanager::filemanager.folder_deleted',['folder'=>$del_folder]));
+                ->withSuccess(trans('filemanager::filemanager.folder_deleted', ['folder' => $del_folder]));
         }
 
-        $error = $result ? : trans('filemanager::filemanager.error_deleting_folder');
+        $error = $result ?: trans('filemanager::filemanager.error_deleting_folder');
         return redirect()
             ->back()
             ->withErrors([$error]);
@@ -130,44 +132,24 @@ class UploadController extends Controller
         $result = $this->manager->saveFile($path, $content);
 
         if ($result === true) {
-            $this->saveToDb($fileName,$folder);
+            $this->saveToDb($fileName, $folder);
 
-            if($request->ajax()){
-                $file=$this->manager->fileDetails($path);
-                return Response::json(['success' => true,'status'=>trans('filemanager::filemanager.file_uploaded',['file'=>$fileName]),'file'=>$file]);
+            if ($request->ajax()) {
+                $file = $this->manager->fileDetails($path);
+                return Response::json(['success' => true, 'status' => trans('filemanager::filemanager.file_uploaded', ['file' => $fileName]), 'file' => $file]);
             }
             return redirect()
                 ->back()
-                ->withSuccess(trans('filemanager::filemanager.file_uploaded',['file'=>$fileName]));
+                ->withSuccess(trans('filemanager::filemanager.file_uploaded', ['file' => $fileName]));
         }
 
-        $error = $result ? : trans('filemanager::filemanager.error_uploading_file');
-        if($request->ajax()){
-            return Response::json(['success' => false,'errors'=>[$error]]);
+        $error = $result ?: trans('filemanager::filemanager.error_uploading_file');
+        if ($request->ajax()) {
+            return Response::json(['success' => false, 'errors' => [$error]]);
         }
         return redirect()
             ->back()
             ->withErrors([$error]);
-    }
-
-    public function getTransformation($id,$transformationHandle) {
-        $transformations = config('imageupload.transformations');
-        $transformation = $transformations[$transformationHandle];
-        $upload = Uploads::get($id);
-        if (empty($transformation) || ! is_array($transformation) || $upload == null) {
-            throw new Exception("file not found");
-        }
-
-        $folder = str_finish($upload->folder, '/');
-        $path = $folder. '_'.$transformationHandle . $upload->fileName;
-        if (!Storage::disk(config('filemanager.uploads.storage'))->exists($path)){
-            $path = $folder . $upload->fileName;
-            list($width, $height, $squared) = $transformation;
-            $this->manager->resizeCropImage(Storage::disk(config('filemanager.uploads.storage'))->get($path), $targetFilepath, $width, $height, $squared);
-        }
-
-        return $this->manager->fileWebpath($path);
-
     }
 
     private function saveToDb($fileName, $folder)
@@ -176,5 +158,10 @@ class UploadController extends Controller
         $upload->filename = $fileName;
         $upload->folder = $folder;
         $upload->save();
+    }
+
+    private function delFromDb($fileName, $folder)
+    {
+        Uploads::where('filename', $fileName)->where('folder', $folder)->delete();
     }
 }

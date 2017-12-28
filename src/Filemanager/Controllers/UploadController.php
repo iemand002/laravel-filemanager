@@ -2,17 +2,19 @@
 
 namespace Iemand002\Filemanager\Controllers;
 
+use Exception;
 use Iemand002\Filemanager\Requests\UploadFileRequest;
 use Iemand002\Filemanager\Requests\UploadNewFolderRequest;
 use Iemand002\Filemanager\Services\UploadsManager;
 
+use Iemand002\Filemanager\models\Uploads;
 use Illuminate\Http\Request;
 
-use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Storage;
 
 
 class UploadController extends Controller
@@ -121,12 +123,15 @@ class UploadController extends Controller
         $file = $_FILES['file'];
         $fileName = $request->get('file_name');
         $fileName = $fileName ?: $file['name'];
-        $path = str_finish($request->get('folder'), '/') . $fileName;
+        $folder = str_finish($request->get('folder'), '/');
+        $path = $folder . $fileName;
         $content = File::get($file['tmp_name']);
 
         $result = $this->manager->saveFile($path, $content);
 
         if ($result === true) {
+            $this->saveToDb($fileName,$folder);
+
             if($request->ajax()){
                 $file=$this->manager->fileDetails($path);
                 return Response::json(['success' => true,'status'=>trans('filemanager::filemanager.file_uploaded',['file'=>$fileName]),'file'=>$file]);
@@ -143,5 +148,33 @@ class UploadController extends Controller
         return redirect()
             ->back()
             ->withErrors([$error]);
+    }
+
+    public function getTransformation($id,$transformationHandle) {
+        $transformations = config('imageupload.transformations');
+        $transformation = $transformations[$transformationHandle];
+        $upload = Uploads::get($id);
+        if (empty($transformation) || ! is_array($transformation) || $upload == null) {
+            throw new Exception("file not found");
+        }
+
+        $folder = str_finish($upload->folder, '/');
+        $path = $folder. '_'.$transformationHandle . $upload->fileName;
+        if (!Storage::disk(config('filemanager.uploads.storage'))->exists($path)){
+            $path = $folder . $upload->fileName;
+            list($width, $height, $squared) = $transformation;
+            $this->manager->resizeCropImage(Storage::disk(config('filemanager.uploads.storage'))->get($path), $targetFilepath, $width, $height, $squared);
+        }
+
+        return $this->manager->fileWebpath($path);
+
+    }
+
+    private function saveToDb($fileName, $folder)
+    {
+        $upload = new Uploads();
+        $upload->filename = $fileName;
+        $upload->folder = $folder;
+        $upload->save();
     }
 }

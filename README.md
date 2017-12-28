@@ -9,7 +9,7 @@ Multilanguage filemanager package based on http://laravelcoding.com/blog/laravel
 
 ### Composer
 ```bash
-composer require iemand002/filemanager dev-master
+composer require iemand002/filemanager 0.1
 ```
 
 ### Laravel
@@ -19,12 +19,12 @@ Iemand002\Filemanager\FilemanagerServiceProvider::class,
 ```
 
 Add or edit in filesystems.php config the following disk
-```json
-        'public' => [
-            'driver' => 'local',
-            'root' => public_path(config('filemanager.uploads.webpath')),
-            'visibility' => 'public',
-        ],
+```php
+'public' => [
+    'driver' => 'local',
+    'root' => public_path(config('filemanager.uploads.webpath')),
+    'visibility' => 'public',
+],
 ```
 
 ## Publish configuration

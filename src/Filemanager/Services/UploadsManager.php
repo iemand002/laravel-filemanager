@@ -3,17 +3,24 @@ namespace Iemand002\Filemanager\Services;
 
 use Carbon\Carbon;
 use Dflydev\ApacheMimeTypes\PhpRepository;
+use Exception;
 use Illuminate\Support\Facades\Storage;
+use Intervention\Image\ImageManager;
 
 class UploadsManager
 {
     protected $disk;
     protected $mimeDetect;
 
-    public function __construct(PhpRepository $mimeDetect)
+    public function __construct(PhpRepository $mimeDetect, ImageManager $intervention)
     {
         $this->disk = Storage::disk(config('filemanager.uploads.storage'));
         $this->mimeDetect = $mimeDetect;
+        $this->library = config('imageupload.library', 'gd');
+        $this->quality = config('imageupload.quality', 90);
+        $this->intervention = $intervention;
+
+        $this->intervention->configure(['driver' => $this->library]);
     }
 
     /**
@@ -199,5 +206,59 @@ class UploadsManager
         }
 
         return $this->disk->put($path, $content);
+    }
+
+    /**
+     * Resize file to create thumbnail.
+     *
+     * @access public
+     * @param  UploadedFile $uploadedFile
+     * @param  string       $targetFilepath
+     * @param  int          $width
+     * @param  int          $height         (default: null)
+     * @param  bool         $squared        (default: false)
+     * @return array
+     */
+    public function resizeCropImage($uploadedFile, $targetFilepath, $width, $height = null, $squared = false)
+    {
+//        dd($uploadedFile);
+        try {
+            $height = (! empty($height) ? $height : $width);
+            $squared = (isset($squared) ? $squared : false);
+dd(phpinfo());
+            $image = $this->intervention->make($uploadedFile);
+
+            if ($squared) {
+                $width = ($height < $width ? $height : $width);
+                $height = $width;
+
+                $image->fit($width, $height, function ($image) {
+                    $image->upsize();
+                });
+            } else {
+                $image->resize($width, $height, function ($image) {
+                    $image->aspectRatio();
+                });
+            }
+
+            $image->save($targetFilepath, $this->quality);
+
+            // Save to s3
+//            $s3_url = $this->saveToS3($image, $targetFilepath);
+return [];
+//            return [
+//                'path' => dirname($targetFilepath),
+//                'dir' => $this->getRelativePath($targetFilepath),
+//                'filename' => pathinfo($targetFilepath, PATHINFO_BASENAME),
+//                'filepath' => $targetFilepath,
+//                'filedir' => $this->getRelativePath($targetFilepath),
+//                'width' => (int) $image->width(),
+//                'height' => (int) $image->height(),
+//                'filesize' => (int) $image->filesize(),
+//                'is_squared' => (bool) $squared,
+//            ];
+        } catch (Exception $e) {
+            throw new \Mockery\Exception($e->getMessage());
+        }
     }
 }

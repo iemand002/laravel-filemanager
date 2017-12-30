@@ -59,6 +59,9 @@ To change the required middlewares and the prefix change the config file
 Get the url of the uploaded file in your blade via the uploadId: ```{{ Filemanager::getUrl(123) }}```<br>
 If you wish to show a transformed version of an image add the optional ```$transfromHandle```: ```{{ Filemanager::getUrl(123, "transformHandle") }}```<br>
 
+### Demo
+See the demo folder on how to use it.
+
 ## Build-in languages
 * Dutch (nl)
 * English (en)

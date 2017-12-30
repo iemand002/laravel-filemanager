@@ -132,10 +132,10 @@ class UploadController extends Controller
         $result = $this->manager->saveFile($path, $content);
 
         if ($result === true) {
-            $this->saveToDb($fileName, $folder);
+            $upload = $this->saveToDb($fileName, $folder, $this->manager->fileMimeType($path));
 
             if ($request->ajax()) {
-                $file = $this->manager->fileDetails($path);
+                $file = $this->manager->fileDetails($upload);
                 return Response::json(['success' => true, 'status' => trans('filemanager::filemanager.file_uploaded', ['file' => $fileName]), 'file' => $file]);
             }
             return redirect()
@@ -152,12 +152,15 @@ class UploadController extends Controller
             ->withErrors([$error]);
     }
 
-    private function saveToDb($fileName, $folder)
+    private function saveToDb($fileName, $folder, $mimeType)
     {
         $upload = new Uploads();
         $upload->filename = $fileName;
         $upload->folder = $folder;
+        $upload->mimeType = $mimeType;
         $upload->save();
+
+        return $upload;
     }
 
     private function delFromDb($fileName, $folder)

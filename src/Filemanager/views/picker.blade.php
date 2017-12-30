@@ -113,7 +113,7 @@
                         @foreach ($files as $file)
                             <tr>
                                 <td>
-                                    <a href="javascript:useFile('{{ $file['name'] }}')">
+                                    <a href="javascript:useFile('{{$file['id']}}','{{ $file['name'] }}')">
                                         @if (is_image($file['mimeType']))
                                             <i class="fa fa-file-image-o fa-lg fa-fw"></i>
                                         @else
@@ -183,7 +183,7 @@
         @if(config('filemanager.jquery_datatables.use'))
         $(function () {
             $("#uploads-table").DataTable({
-                @if(Config::get('app.locale')=='nl')
+                @if(config('app.locale')=='nl')
                 "language": {
                     "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Dutch.json"
                 }
@@ -193,7 +193,8 @@
 
         @endif
 
-        function useFile(file) {
+        function useFile(id, file) {
+            var webpath = '{{config('filemanager.uploads.webpath')}}';
             function getUrlParam(paramName) {
                 var reParam = new RegExp('(?:[\?&]|&)' + paramName + '=([^&]+)', 'i');
                 var match = window.location.search.match(reParam);
@@ -207,14 +208,17 @@
                     // use CKEditor 3.0 + integration method
                     if (window.opener) {
                         // Popup
-                        window.opener.CKEDITOR.tools.callFunction(getUrlParam('CKEditorFuncNum'), '/img' + folder + file);
+                        window.opener.CKEDITOR.tools.callFunction(getUrlParam('CKEditorFuncNum'), '/' + webpath + folder + file);
                     } else {
                         // Modal (in iframe)
-                        parent.CKEDITOR.tools.callFunction(getUrlParam('CKEditorFuncNum'), '/img' + folder + file);
+                        parent.CKEDITOR.tools.callFunction(getUrlParam('CKEditorFuncNum'), '/' + webpath + folder + file);
                         parent.CKEDITOR.tools.callFunction(getUrlParam('CKEditorCleanUpFuncNum'));
                     }
                 } else {
-                    window.opener.document.getElementById(getUrlParam('id')).value = folder + file;
+                    window.opener.document.getElementById(getUrlParam('id')).value = id;
+                    @if(isset($_GET['file']))
+                    window.opener.document.getElementById(getUrlParam('file')).value = folder + file;
+                    @endif
                     @if(config('filemanager.on_change'))
                     window.opener.document.getElementById(getUrlParam('id')).onchange();
                     @endif

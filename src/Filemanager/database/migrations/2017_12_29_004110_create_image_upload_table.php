@@ -25,6 +25,7 @@ class CreateImageUploadTable extends Migration
                 $table->increments('id');
                 $table->string('filename')->nullable();
                 $table->string('folder')->nullable();
+                $table->string('mimeType')->nullable();
                 $table->timestamps();
             });
         }

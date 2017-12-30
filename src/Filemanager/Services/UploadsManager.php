@@ -5,6 +5,7 @@ namespace Iemand002\Filemanager\Services;
 use Carbon\Carbon;
 use Dflydev\ApacheMimeTypes\PhpRepository;
 use Exception;
+use Iemand002\Filemanager\models\Uploads;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\ImageManager;
 use RecursiveDirectoryIterator;
@@ -49,6 +50,8 @@ class UploadsManager
         $folderName = current($slice);
         $breadcrumbs = array_slice($breadcrumbs, 0, -1);
 
+        $uploads = Uploads::where('folder',$folder)->get();
+
         $subfolders = [];
         foreach (array_unique($this->disk->directories($folder)) as $subfolder) {
             if (!starts_with(basename($subfolder), '_')) {
@@ -57,8 +60,8 @@ class UploadsManager
         }
 
         $files = [];
-        foreach ($this->disk->files($folder) as $path) {
-            $files[] = $this->fileDetails($path);
+        foreach ($uploads as $upload) {
+            $files[] = $this->fileDetails($upload);
         }
 
         return compact(
@@ -103,15 +106,16 @@ class UploadsManager
     /**
      * Return an array of file details for a file
      */
-    public function fileDetails($path)
+    public function fileDetails(Uploads $upload)
     {
-        $path = '/' . ltrim($path, '/');
+        $path = $upload->folder. $upload->filename;
 
         return [
-            'name' => basename($path),
+            'id' => $upload->id,
+            'name' => $upload->filename,
             'fullPath' => $path,
             'webPath' => $this->fileWebpath($path),
-            'mimeType' => $this->fileMimeType($path),
+            'mimeType' => $upload->mimeType,
             'size' => $this->fileSize($path),
             'modified' => $this->fileModified($path),
         ];
@@ -133,7 +137,7 @@ class UploadsManager
     public function fileMimeType($path)
     {
         return $this->mimeDetect->findType(
-            pathinfo($path, PATHINFO_EXTENSION)
+            pathinfo(strtolower($path), PATHINFO_EXTENSION)
         );
     }
 

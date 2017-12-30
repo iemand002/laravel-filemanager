@@ -19,27 +19,36 @@ class FilemanagerBuilder
 
     public function getUrl($id, $transformHandle = null)
     {
-        $transforms = config('filemanager.transforms');
-        $transform = $transforms[$transformHandle];
         $upload = Uploads::find($id);
 
-        if (empty($transform) || !is_array($transform) || $upload == null) {
-//            throw new Exception("file not found");
+        if ($upload == null) {
             return null;
         }
 
         $folder = str_finish($upload->folder, '/');
-        $transformFolder = str_finish($folder . '_' . $transformHandle, '/');
-        $path = $transformFolder . $upload->filename;
-        if (!$this->disk->exists($path)) {
-            $originalPath = $folder . $upload->filename;
-            list($width, $height, $squared, $quality) = $transform;
+        $path = $folder . $upload->filename;
 
-            if (!$this->disk->exists($transformFolder)) {
-                $this->disk->makeDirectory($transformFolder);
+        if(starts_with($upload->mimeType,'image')&&$transformHandle!=null){
+            $transforms = config('filemanager.transforms');
+            $transform = $transforms[$transformHandle];
+
+            if (empty($transform) || !is_array($transform) || $upload == null) {
+                return null;
             }
 
-            $this->manager->resizeCropImage($this->disk->get($originalPath), $path, $upload->filename, $width, $height, $quality, $squared);
+            $transformFolder = str_finish($folder . '_' . $transformHandle, '/');
+            $path = $transformFolder . $upload->filename;
+
+            if (!$this->disk->exists($path)) {
+                $originalPath = $folder . $upload->filename;
+                list($width, $height, $squared, $quality) = $transform;
+
+                if (!$this->disk->exists($transformFolder)) {
+                    $this->disk->makeDirectory($transformFolder);
+                }
+
+                $this->manager->resizeCropImage($this->disk->get($originalPath), $path, $upload->filename, $width, $height, $quality, $squared);
+            }
         }
 
         return $this->manager->fileWebpath($path);

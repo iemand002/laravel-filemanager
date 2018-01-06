@@ -28,6 +28,9 @@ class UploadController extends Controller
 
     /**
      * Show page of files / subfolders
+     *
+     * @param Request $request
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function index(Request $request)
     {
@@ -40,6 +43,9 @@ class UploadController extends Controller
 
     /**
      * Show page of files / subfolders
+     *
+     * @param Request $request
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function picker(Request $request)
     {
@@ -50,7 +56,32 @@ class UploadController extends Controller
     }
 
     /**
+     * Sync files uploaded in the folder that are not in the database with the database
+     *
+     * @param string $folder
+     */
+    public function sync($folder = '/')
+    {
+        $data = $this->manager->folderInfoDisk($folder);
+
+        foreach ($data['files'] as $file) {
+            if (Uploads::where('filename', $file['name'])->where('folder', $data['folder'])->count() == 0) {
+                $this->saveToDb($file['name'], str_finish($data['folder'], '/'), $file['mimeType']);
+            }
+        }
+
+        foreach ($data['subfolders'] as $subfolder => $key) {
+            $this->sync($subfolder);
+        }
+
+        return 'Files synced: ' . date('Y-m-d H:i:s');
+    }
+
+    /**
      * Create a new folder
+     *
+     * @param UploadNewFolderRequest $request
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function createFolder(UploadNewFolderRequest $request)
     {
@@ -73,6 +104,9 @@ class UploadController extends Controller
 
     /**
      * Delete a file
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function deleteFile(Request $request)
     {
@@ -97,6 +131,9 @@ class UploadController extends Controller
 
     /**
      * Delete a folder
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function deleteFolder(Request $request)
     {
@@ -119,6 +156,9 @@ class UploadController extends Controller
 
     /**
      * Upload new file
+     *
+     * @param UploadFileRequest $request
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function uploadFile(UploadFileRequest $request)
     {
@@ -152,6 +192,14 @@ class UploadController extends Controller
             ->withErrors([$error]);
     }
 
+    /**
+     * Save upload to the database
+     *
+     * @param $fileName
+     * @param $folder
+     * @param $mimeType
+     * @return Uploads
+     */
     private function saveToDb($fileName, $folder, $mimeType)
     {
         $upload = new Uploads();
@@ -163,6 +211,12 @@ class UploadController extends Controller
         return $upload;
     }
 
+    /**
+     * Delete file in folder from the database
+     *
+     * @param $fileName
+     * @param $folder
+     */
     private function delFromDb($fileName, $folder)
     {
         Uploads::where('filename', $fileName)->where('folder', $folder)->delete();

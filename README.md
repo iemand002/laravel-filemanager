@@ -1,16 +1,16 @@
 # laravel-filemanager
-Multilanguage filemanager package based on http://laravelcoding.com/blog/laravel-5-beauty-upload-manager?tag=L5+Beauty<br>
+Multi language filem anager package based on http://laravelcoding.com/blog/laravel-5-beauty-upload-manager?tag=L5+Beauty<br>
 Using ```intervention/image``` to create image transforms (inspired by ```matriphe/imageupload```).
 
 ## Installation
 ### Requirements
-* Laravel 5.2 (version 0.2)
+* Laravel 5.2 (version 0.3)
 * Twitter Bootstrap
 * Jquery
 
 ### Composer
 ```bash
-composer require iemand002/filemanager 0.2
+composer require iemand002/filemanager 0.3
 ```
 
 ### Laravel
@@ -58,6 +58,8 @@ To change the required middlewares and the prefix change the config file
 <br><br>
 Get the url of the uploaded file in your blade via the uploadId: ```{{ Filemanager::getUrl(123) }}```<br>
 If you wish to show a transformed version of an image add the optional ```$transfromHandle```: ```{{ Filemanager::getUrl(123, "transformHandle") }}```<br>
+<br>
+Want to sync earlier uploaded files in the folder? Surf to ```yourwebsite.io/admin/sync``` to add missing files in the database.
 
 ### Demo
 See the demo folder on how to use it.

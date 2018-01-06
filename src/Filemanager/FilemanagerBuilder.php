@@ -17,6 +17,13 @@ class FilemanagerBuilder
         $this->disk = Storage::disk(config('filemanager.uploads.storage'));
     }
 
+    /**
+     * Get the url of a uploaded file
+     *
+     * @param $id
+     * @param null $transformHandle
+     * @return \Illuminate\Contracts\Routing\UrlGenerator|null|string
+     */
     public function getUrl($id, $transformHandle = null)
     {
         $upload = Uploads::find($id);

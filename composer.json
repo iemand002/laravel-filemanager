@@ -1,6 +1,6 @@
 {
     "name": "iemand002/filemanager",
-    "description": "Multilanguage filemanager package based on tutorial from http://laravelcoding.com/blog/laravel-5-beauty-upload-manager?tag=L5+Beauty",
+    "description": "Multi language file manager package",
     "keywords": [
         "laravel"
     ],
@@ -11,7 +11,7 @@
         }
     ],
     "require": {
-        "laravel/framework": "~5.1",
+        "laravel/framework": "5.2.*",
         "intervention/image": "^2.4",
         "dflydev/apache-mime-types": "^1.0"
     },

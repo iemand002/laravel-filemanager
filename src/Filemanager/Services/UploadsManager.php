@@ -30,7 +30,7 @@ class UploadsManager
     }
 
     /**
-     * Return files and directories within a folder
+     * Return files and directories within a folder found in the database
      *
      * @param string $folder
      * @return array of [
@@ -50,7 +50,7 @@ class UploadsManager
         $folderName = current($slice);
         $breadcrumbs = array_slice($breadcrumbs, 0, -1);
 
-        $uploads = Uploads::where('folder',$folder)->get();
+        $uploads = Uploads::where('folder', str_finish($folder, '/'))->get();
 
         $subfolders = [];
         foreach (array_unique($this->disk->directories($folder)) as $subfolder) {
@@ -74,7 +74,43 @@ class UploadsManager
     }
 
     /**
+     * Return files and directories within a folder found on the disk
+     *
+     * @param string $folder
+     * @return array of [
+     *    'folder' => 'path to current folder',
+     *    'folders' => array of [ $path => $foldername] of each subfolder
+     *    'files' => array of file details on each file in folder
+     * ]
+     */
+    public function folderInfoDisk($folder)
+    {
+        $folder = $this->cleanFolder($folder);
+
+        $subfolders = [];
+        foreach (array_unique($this->disk->directories($folder)) as $subfolder) {
+            if (!starts_with(basename($subfolder), '_')) {
+                $subfolders["/$subfolder"] = basename($subfolder);
+            }
+        }
+
+        $files = [];
+        foreach ($this->disk->files($folder) as $path) {
+            $files[] = $this->fileDetailsDisk($path);
+        }
+
+        return compact(
+            'folder',
+            'subfolders',
+            'files'
+        );
+    }
+
+    /**
      * Sanitize the folder name
+     *
+     * @param $folder
+     * @return string
      */
     protected function cleanFolder($folder)
     {
@@ -83,6 +119,9 @@ class UploadsManager
 
     /**
      * Return breadcrumbs to current folder
+     *
+     * @param $folder
+     * @return array
      */
     protected function breadcrumbs($folder)
     {
@@ -104,11 +143,14 @@ class UploadsManager
     }
 
     /**
-     * Return an array of file details for a file
+     * Return an array of file details for a file found in the database
+     *
+     * @param Uploads $upload
+     * @return array
      */
     public function fileDetails(Uploads $upload)
     {
-        $path = $upload->folder. $upload->filename;
+        $path = $upload->folder . $upload->filename;
 
         return [
             'id' => $upload->id,
@@ -122,7 +164,26 @@ class UploadsManager
     }
 
     /**
+     * Return an array of file details for a file
+     *
+     * @param $path
+     * @return array
+     */
+    public function fileDetailsDisk($path)
+    {
+        $path = '/' . ltrim($path, '/');
+
+        return [
+            'name' => basename($path),
+            'mimeType' => $this->fileMimeType($path),
+        ];
+    }
+
+    /**
      * Return the full web path to a file
+     *
+     * @param $path
+     * @return \Illuminate\Contracts\Routing\UrlGenerator|string
      */
     public function fileWebpath($path)
     {
@@ -133,6 +194,9 @@ class UploadsManager
 
     /**
      * Return the mime type
+     *
+     * @param $path
+     * @return mixed|null|string
      */
     public function fileMimeType($path)
     {
@@ -143,6 +207,9 @@ class UploadsManager
 
     /**
      * Return the file size
+     *
+     * @param $path
+     * @return
      */
     public function fileSize($path)
     {
@@ -151,6 +218,9 @@ class UploadsManager
 
     /**
      * Return the last modified time
+     *
+     * @param $path
+     * @return Carbon
      */
     public function fileModified($path)
     {
@@ -161,6 +231,9 @@ class UploadsManager
 
     /**
      * Create a new directory
+     *
+     * @param $folder
+     * @return string|\Symfony\Component\Translation\TranslatorInterface
      */
     public function createDirectory($folder)
     {
@@ -175,6 +248,9 @@ class UploadsManager
 
     /**
      * Delete a directory
+     *
+     * @param $folder
+     * @return string|\Symfony\Component\Translation\TranslatorInterface
      */
     public function deleteDirectory($folder)
     {
@@ -193,6 +269,9 @@ class UploadsManager
 
     /**
      * Delete a file
+     *
+     * @param $path
+     * @return string|\Symfony\Component\Translation\TranslatorInterface
      */
     public function deleteFile($path)
     {
@@ -207,6 +286,10 @@ class UploadsManager
 
     /**
      * Save a file
+     *
+     * @param $path
+     * @param $content
+     * @return string|\Symfony\Component\Translation\TranslatorInterface
      */
     public function saveFile($path, $content)
     {
@@ -264,6 +347,9 @@ class UploadsManager
         }
     }
 
+    /**
+     * Remove the temporary created folder and files
+     */
     private function removeTemp()
     {
         $it = new RecursiveDirectoryIterator($this->tempFolder, RecursiveDirectoryIterator::SKIP_DOTS);

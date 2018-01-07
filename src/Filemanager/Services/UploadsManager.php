@@ -316,7 +316,6 @@ class UploadsManager
     public function resizeCropImage($uploadedFile, $targetFilepath, $filename, $width, $height = null, $quality = null, $squared = false)
     {
         try {
-            $height = (!empty($height) ? $height : $width);
             $quality = (!empty($quality) ? $quality : $this->quality);
             $squared = (isset($squared) ? $squared : false);
 

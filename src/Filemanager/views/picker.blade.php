@@ -23,6 +23,8 @@
                                 $link .= "&CKEditor=my-editor&CKEditorFuncNum=0";
                             if (isset($_GET['id']))
                                 $link .= "&id=" . $_GET['id'];
+                            if (isset($_GET['file']))
+                                $link .= "&file=" . $_GET['file'];
                             ?>
                             <li><a href="{{$link}}">{{ $disp }}</a></li>
                         @endforeach
@@ -208,10 +210,10 @@
                     // use CKEditor 3.0 + integration method
                     if (window.opener) {
                         // Popup
-                        window.opener.CKEDITOR.tools.callFunction(getUrlParam('CKEditorFuncNum'), '/' + webpath + folder + file);
+                        window.opener.CKEDITOR.tools.callFunction(getUrlParam('CKEditorFuncNum'), webpath + folder + file);
                     } else {
                         // Modal (in iframe)
-                        parent.CKEDITOR.tools.callFunction(getUrlParam('CKEditorFuncNum'), '/' + webpath + folder + file);
+                        parent.CKEDITOR.tools.callFunction(getUrlParam('CKEditorFuncNum'), webpath + folder + file);
                         parent.CKEDITOR.tools.callFunction(getUrlParam('CKEditorCleanUpFuncNum'));
                     }
                 } else {

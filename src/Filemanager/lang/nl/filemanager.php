@@ -37,6 +37,7 @@ return [
     'folder_created' => "Map :folder aangemaakt.",
     'error_creating_folder' => "Er is een fout opgetreden bij het aanmaken van de nieuwe map.",
     'file_deleted' => "Bestand ':file' verwijderd.",
+    'error_file_delete_in_use' => "Dit bestand is in gebruik en kan nu niet worden verwijderd.",
     'error_deleting_file' => "Er is een fout opgetreden bij het verwijderen van het bestand.",
     'folder_deleted' => "FMap ':folder' verwijderd.",
     'error_deleting_folder' => "Er is een fout opgetreden bij het verwijderen van de map.",

@@ -25,10 +25,10 @@ return [
     'create' => 'Create',
     'cancel' => 'Cancel',
     'success' => 'Success!',
-    'whoops' => 'Whoopa!',
+    'whoops' => 'Whoops!',
 
     // UploadManager
-    'folder_exists' => "Folder ':folder' aleady exists.",
+    'folder_exists' => "Folder ':folder' already exists.",
     'folder_must_be_empty' => "Directory must be empty to delete it.",
     'file_not_exist' => "File does not exist.",
     'file_exits' => "File already exists.",
@@ -37,6 +37,7 @@ return [
     'folder_created' => "Folder ':folder' created.",
     'error_creating_folder' => "An error occurred creating folder.",
     'file_deleted' => "File ':file' deleted.",
+    'error_file_delete_in_use' => "This file is used somewhere and can't be deleted now",
     'error_deleting_file' => "An error occurred deleting file.",
     'folder_deleted' => "Folder ':folder' deleted.",
     'error_deleting_folder' => "An error occurred deleting folder.",

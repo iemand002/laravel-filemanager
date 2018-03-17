@@ -8,6 +8,7 @@ use Iemand002\Filemanager\Requests\UploadNewFolderRequest;
 use Iemand002\Filemanager\Services\UploadsManager;
 
 use Iemand002\Filemanager\models\Uploads;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 
 use App\Http\Controllers\Controller;
@@ -111,16 +112,17 @@ class UploadController extends Controller
     public function deleteFile(Request $request)
     {
         $del_file = $request->get('del_file');
-        $path = $request->get('folder') . '/' . $del_file;
+        $result = $this->delFromDb($del_file, str_finish($request->get('folder'), '/'));
+        if ($result === true){
 
-        $result = $this->manager->deleteFile($path);
+            $path = $request->get('folder') . '/' . $del_file;
+            $result = $this->manager->deleteFile($path);
+            if ($result === true){
 
-        if ($result === true) {
-            $this->delFromDb($del_file, str_finish($request->get('folder'), '/'));
-
-            return redirect()
-                ->back()
-                ->withSuccess(trans('filemanager::filemanager.file_deleted', ['file' => $del_file]));
+                return redirect()
+                    ->back()
+                    ->withSuccess(trans('filemanager::filemanager.file_deleted', ['file' => $del_file]));
+            }
         }
 
         $error = $result ?: trans('filemanager::filemanager.error_deleting_file');
@@ -219,6 +221,13 @@ class UploadController extends Controller
      */
     private function delFromDb($fileName, $folder)
     {
-        Uploads::where('filename', $fileName)->where('folder', $folder)->delete();
+        try {
+            Uploads::where('filename', $fileName)->where('folder', $folder)->delete();
+        } catch (QueryException $e) {
+            if($e->errorInfo[0] == 23000){
+                return trans('filemanager::filemanager.error_file_delete_in_use');
+            }
+            return trans('filemanager::filemanager.error_deleting_file');
+        }
     }
 }

@@ -19,5 +19,15 @@
         "psr-4": {
             "Iemand002\\Filemanager\\": "src/Filemanager"
         }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Iemand002\\Filemanager\\FilemanagerServiceProvider"
+            ],
+            "aliases": {
+                "Filemanager": "Iemand002\\Filemanager\\FilemanagerFacade"
+            }
+        }
     }
 }

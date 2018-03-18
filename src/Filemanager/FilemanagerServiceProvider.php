@@ -16,17 +16,29 @@ class FilemanagerServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->loadTranslationsFrom(__DIR__ . '/lang', 'filemanager');
-        $this->loadViewsFrom(__DIR__ . '/views', 'iemand002/filemanager');
-        $this->publishes([
-            __DIR__ . '/views' => base_path('resources/views/vendor/iemand002/filemanager')
-        ], 'views');
         $this->publishes([
             __DIR__ . '/config/filemanager.php' => config_path('filemanager.php')
         ], 'config');
+
+        $this->loadRoutesFrom(__DIR__.'/routes.php');
+
+        $this->loadMigrationsFrom(__DIR__.'/database/migrations');
+
         $this->publishes([
             __DIR__ . '/database/migrations' => base_path('database/migrations')
         ], 'migration');
+
+        $this->loadTranslationsFrom(__DIR__ . '/lang', 'filemanager');
+
+        $this->publishes([
+            __DIR__.'/lang' => resource_path('lang/vendor/filemanager'),
+        ], 'translations');
+
+        $this->loadViewsFrom(__DIR__ . '/views', 'iemand002/filemanager');
+
+        $this->publishes([
+            __DIR__ . '/views' => base_path('views/vendor/iemand002/filemanager')
+        ], 'views');
     }
 
     /**

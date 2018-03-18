@@ -229,5 +229,6 @@ class UploadController extends Controller
             }
             return trans('filemanager::filemanager.error_deleting_file');
         }
+        return true;
     }
 }

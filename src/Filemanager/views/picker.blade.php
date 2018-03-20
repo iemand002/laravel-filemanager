@@ -92,6 +92,8 @@
                                         $link .= "&CKEditor=my-editor&CKEditorFuncNum=0";
                                     if (isset($_GET['id']))
                                         $link .= "&id=" . $_GET['id'];
+                                    if (isset($_GET['file']))
+                                        $link .= "&file=" . $_GET['file'];
                                     ?>
                                     <a href="{{$link}}">
                                         <i class="fa fa-folder fa-lg fa-fw"></i>

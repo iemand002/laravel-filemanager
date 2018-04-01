@@ -14,7 +14,11 @@ class FilemanagerBuilder
     public function __construct()
     {
         $this->manager = new Services\UploadsManager(new PhpRepository(), new ImageManager());
-        $this->disk = Storage::disk(config('filemanager.uploads.storage'));
+        if(config('filemanager.uploads.storage') == 'cloud') {
+            $this->disk = Storage::disk(config('filesystems.cloud'));
+        } else {
+            $this->disk = Storage::disk(config('filesystems.default'));
+        }
     }
 
     /**
@@ -58,6 +62,6 @@ class FilemanagerBuilder
             }
         }
 
-        return $this->manager->fileWebpath($path);
+        return $this->disk->url($path);
     }
 }

@@ -2,8 +2,7 @@
 return [
     // Where to leave the uploads?
     'uploads' => [
-        'storage' => 'public',
-        'webpath' => '/uploads', // Change in filesystem.php the root to public_path('uploads')
+        'storage' => env('FILEMANAGER_STORAGE','default'), // filesystem 'default' or 'cloud'
         'temp' => 'temp', // temporary upload folder for image transforms
     ],
 

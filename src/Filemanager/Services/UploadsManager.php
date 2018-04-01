@@ -19,7 +19,11 @@ class UploadsManager
 
     public function __construct(PhpRepository $mimeDetect, ImageManager $intervention)
     {
-        $this->disk = Storage::disk(config('filemanager.uploads.storage'));
+        if (config('filemanager.uploads.storage') == 'cloud') {
+            $this->disk = Storage::disk(config('filesystems.cloud'));
+        } else {
+            $this->disk = Storage::disk(config('filesystems.default'));
+        }
         $this->tempFolder = public_path(config('filemanager.uploads.temp', 'temp'));
         $this->mimeDetect = $mimeDetect;
         $this->library = config('filemanager.library', 'gd');
@@ -156,7 +160,7 @@ class UploadsManager
             'id' => $upload->id,
             'name' => $upload->filename,
             'fullPath' => $path,
-            'webPath' => $this->fileWebpath($path),
+            'webPath' => $this->disk->url($path),
             'mimeType' => $upload->mimeType,
             'size' => $this->fileSize($path),
             'modified' => $this->fileModified($path),
@@ -177,19 +181,6 @@ class UploadsManager
             'name' => basename($path),
             'mimeType' => $this->fileMimeType($path),
         ];
-    }
-
-    /**
-     * Return the full web path to a file
-     *
-     * @param $path
-     * @return \Illuminate\Contracts\Routing\UrlGenerator|string
-     */
-    public function fileWebpath($path)
-    {
-        $path = rtrim(config('filemanager.uploads.webpath'), '/') . '/' .
-            ltrim($path, '/');
-        return url($path);
     }
 
     /**

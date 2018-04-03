@@ -11,14 +11,13 @@ class FilemanagerBuilder
 {
     protected $manager, $disk;
 
+    /**
+     * FilemanagerBuilder constructor.
+     */
     public function __construct()
     {
         $this->manager = new Services\UploadsManager(new PhpRepository(), new ImageManager());
-        if(config('filemanager.uploads.storage') == 'cloud') {
-            $this->disk = Storage::disk(config('filesystems.cloud'));
-        } else {
-            $this->disk = Storage::disk(config('filesystems.default'));
-        }
+        $this->disk = Storage::disk(config('filesystems.' . config('filemanager.uploads.storage')));
     }
 
     /**
@@ -39,7 +38,7 @@ class FilemanagerBuilder
         $folder = str_finish($upload->folder, '/');
         $path = $folder . $upload->filename;
 
-        if(starts_with($upload->mimeType,'image')&&$transformHandle!=null){
+        if (starts_with($upload->mimeType, 'image') && $transformHandle != null) {
             $transforms = config('filemanager.transforms');
             $transform = $transforms[$transformHandle];
 

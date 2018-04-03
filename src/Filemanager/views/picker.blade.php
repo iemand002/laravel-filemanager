@@ -198,7 +198,7 @@
         @endif
 
         function useFile(id, file) {
-            var webpath = '{{config('filemanager.uploads.webpath')}}';
+            var webpath = '{{config('filesystems.disks.' . config('filesystems.' .  config('filemanager.uploads.storage')) . '.url')}}';
             function getUrlParam(paramName) {
                 var reParam = new RegExp('(?:[\?&]|&)' + paramName + '=([^&]+)', 'i');
                 var match = window.location.search.match(reParam);

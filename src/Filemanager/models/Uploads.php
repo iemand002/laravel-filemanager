@@ -9,6 +9,10 @@ class Uploads extends Model
     protected $table;
     public $timestamps = true;
 
+    /**
+     * Uploads constructor.
+     * @param array $attributes
+     */
     public function __construct(array $attributes = [])
     {
         $this->table = config('filemanager.table', 'image_uploads');

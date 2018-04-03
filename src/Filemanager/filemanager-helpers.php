@@ -2,6 +2,9 @@
 
 /**
  * Return sizes readable by humans
+ * @param $bytes
+ * @param int $decimals
+ * @return string
  */
 function human_filesize($bytes, $decimals = 2)
 {
@@ -14,6 +17,8 @@ function human_filesize($bytes, $decimals = 2)
 
 /**
  * Is the mime type an image
+ * @param $mimeType
+ * @return bool
  */
 function is_image($mimeType)
 {

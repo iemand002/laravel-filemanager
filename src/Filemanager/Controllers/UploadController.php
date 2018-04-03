@@ -22,6 +22,10 @@ class UploadController extends Controller
 {
     protected $manager;
 
+    /**
+     * UploadController constructor.
+     * @param UploadsManager $manager
+     */
     public function __construct(UploadsManager $manager)
     {
         $this->manager = $manager;
@@ -60,6 +64,7 @@ class UploadController extends Controller
      * Sync files uploaded in the folder that are not in the database with the database
      *
      * @param string $folder
+     * @return string
      */
     public function sync($folder = '/')
     {
@@ -160,7 +165,8 @@ class UploadController extends Controller
      * Upload new file
      *
      * @param UploadFileRequest $request
-     * @return \Illuminate\Http\RedirectResponse
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
     public function uploadFile(UploadFileRequest $request)
     {

@@ -17,13 +17,14 @@ class UploadsManager
     protected $disk;
     protected $mimeDetect;
 
+    /**
+     * UploadsManager constructor.
+     * @param PhpRepository $mimeDetect
+     * @param ImageManager $intervention
+     */
     public function __construct(PhpRepository $mimeDetect, ImageManager $intervention)
     {
-        if (config('filemanager.uploads.storage') == 'cloud') {
-            $this->disk = Storage::disk(config('filesystems.cloud'));
-        } else {
-            $this->disk = Storage::disk(config('filesystems.default'));
-        }
+        $this->disk = Storage::disk(config('filesystems.' . config('filemanager.uploads.storage')));
         $this->tempFolder = public_path(config('filemanager.uploads.temp', 'temp'));
         $this->mimeDetect = $mimeDetect;
         $this->library = config('filemanager.library', 'gd');

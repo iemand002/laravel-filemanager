@@ -37,7 +37,7 @@ class FilemanagerServiceProvider extends ServiceProvider
         $this->loadViewsFrom(__DIR__ . '/views', 'iemand002/filemanager');
 
         $this->publishes([
-            __DIR__ . '/views' => base_path('views/vendor/iemand002/filemanager')
+            __DIR__ . '/views' => resource_path('views/vendor/iemand002/filemanager')
         ], 'views');
     }
 

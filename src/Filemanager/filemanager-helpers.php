@@ -1,5 +1,7 @@
 <?php
 
+use Iemand002\Filemanager\models\Social;
+
 /**
  * Return sizes readable by humans
  * @param $bytes
@@ -23,4 +25,21 @@ function human_filesize($bytes, $decimals = 2)
 function is_image($mimeType)
 {
     return starts_with($mimeType, 'image/');
+}
+
+function is_dropbox_configured(){
+    if(config('services.dropbox.client_id') && config('services.dropbox.client_secret') && config('services.dropbox.redirect')){
+        return true;
+    }
+    return false;
+}
+
+function is_dropbox_loggedIn(){
+    if(is_dropbox_configured() && auth()->check()){
+        $social = Social::where('user_id', auth()->id())->where('provider', 'dropbox')->first();
+        if($social) {
+            return true;
+        }
+    }
+    return false;
 }

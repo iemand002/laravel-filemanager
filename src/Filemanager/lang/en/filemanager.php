@@ -27,6 +27,8 @@ return [
     'success' => 'Success!',
     'whoops' => 'Whoops!',
 
+    'connect_dropbox_btn' => 'Connect Dropbox',
+
     // UploadManager
     'folder_exists' => "Folder ':folder' already exists.",
     'folder_must_be_empty' => "Directory must be empty to delete it.",

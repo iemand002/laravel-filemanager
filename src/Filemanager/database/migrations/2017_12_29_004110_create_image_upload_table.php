@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateImageUploadTable extends Migration
 {
-    protected  $table;
+    protected $table;
 
     public function __construct()
     {

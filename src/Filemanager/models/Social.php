@@ -4,7 +4,7 @@ namespace Iemand002\Filemanager\models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Uploads extends Model
+class Social extends Model
 {
     protected $table;
     public $timestamps = true;
@@ -15,7 +15,12 @@ class Uploads extends Model
      */
     public function __construct(array $attributes = [])
     {
-        $this->table = config('filemanager.table', 'uploads');
+        $this->table = config('filemanager.social_table', 'social_logins');
         parent::__construct($attributes);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo('App\User');
     }
 }

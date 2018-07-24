@@ -27,6 +27,10 @@ return [
     'success' => 'Gelukt!',
     'whoops' => 'Oeps!',
 
+    'connect_dropbox_btn' => 'Connect Dropbox',
+    'provider_not_found' => 'Provider :provider is niet geconfigureerd',
+    'logged_in_social_provider' => 'Ingelogd bij :provider',
+
     // UploadManager
     'folder_exists' => 'Map :folder bestaat al.',
     'folder_must_be_empty' => "Map moet leeg zijn om verwijderd te kunnen worden.",

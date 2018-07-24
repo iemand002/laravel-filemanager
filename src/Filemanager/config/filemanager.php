@@ -7,7 +7,8 @@ return [
     ],
 
     // Table
-    'table' => 'uploads',
+    'table' => 'uploads', // Table to store the uploads
+    'social_table' => 'social_logins', // Table to store the social logins
 
     /*
      * Library used to manipulate image.
@@ -22,7 +23,7 @@ return [
     'quality' => env('IMAGEUPLOAD_QUALITY', 90),
 
     // routes
-    'middleware' => array('web'), // if you don't want to use a middleware make it 'none'
+    'middleware' => [], // web middleware by default
     'prefix' => 'admin',
 
     // Page sections

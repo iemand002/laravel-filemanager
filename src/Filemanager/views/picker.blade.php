@@ -41,6 +41,15 @@
                         data-toggle="modal" data-target="#modal-file-upload">
                     <i class="fa fa-upload"></i> {{trans('filemanager::filemanager.upload')}}
                 </button>
+                @php
+                    $params['provider']='dropbox';
+                @endphp
+                @if(is_dropbox_configured())
+                    <a href="{{ route('social.redirect', $params) }}" class="btn btn-dropbox">
+                        <i class="fa fa-dropbox"></i>
+                        {{trans('filemanager::filemanager.connect_dropbox_btn')}}
+                    </a>
+                @endif
             </div>
         </div>
 
@@ -83,6 +92,28 @@
                         </thead>
                         <tbody>
 
+                        @if(is_dropbox_loggedIn())
+                            <tr>
+                                <td>
+                                    <?php $link = route('filemanager.pickerDropbox') . "?folder=";
+                                    if (isset($_GET['CKEditor']))
+                                        $link .= "&CKEditor=my-editor&CKEditorFuncNum=0";
+                                    if (isset($_GET['id']))
+                                        $link .= "&id=" . $_GET['id'];
+                                    if (isset($_GET['file']))
+                                        $link .= "&file=" . $_GET['file'];
+                                    ?>
+                                    <a href="{{$link}}">
+                                        <i class="fa fa-dropbox fa-lg fa-fw"></i>
+                                        Dropbox
+                                    </a>
+                                </td>
+                                <td>{{trans('filemanager::filemanager.social')}}</td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>-</td>
+                            </tr>
+                        @endif
                         {{-- The Subfolders --}}
                         @foreach ($subfolders as $path => $name)
                             <tr>

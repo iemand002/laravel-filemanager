@@ -55,6 +55,9 @@ To change the required middlewares and the prefix change the config file
 Get the url of the uploaded file in your blade via the uploadId: ```{{ Filemanager::getUrl(123) }}```<br>
 If you wish to show a transformed version of an image add the optional ```$transfromHandle```: ```{{ Filemanager::getUrl(123, "transformHandle") }}```<br>
 <br>
+Get the image width and height via the uploadId: ```{{ Filemanager::getWidth(123) }}``` and ```{{ Filemanager::getHeight(123) }}```<br>
+Also compatable with the transform: ```{{ Filemanager::getWidth(123, "transformHandle") }}``` and ```{{ Filemanager::getHeight(123, "transformHandle") }}```<br>
+<br>
 Want to sync earlier uploaded files in the folder with the database? Surf to ```yourwebsite.io/admin/sync``` to add missing files in the database.
 
 ### Demo

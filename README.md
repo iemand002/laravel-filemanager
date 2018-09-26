@@ -1,5 +1,5 @@
 # laravel-filemanager
-Multi language filem anager package based on http://laravelcoding.com/blog/laravel-5-beauty-upload-manager?tag=L5+Beauty<br>
+Multi language filem anager package based on https://web.archive.org/web/20160425103612/http://laravelcoding.com:80/blog/laravel-5-beauty-upload-manager?tag=L5+Beauty<br>
 Using ```intervention/image``` to create image transforms (inspired by ```matriphe/imageupload```).
 
 ## Installation

@@ -1,5 +1,5 @@
 # laravel-filemanager
-* Multi language file manager package based on http://laravelcoding.com/blog/laravel-5-beauty-upload-manager?tag=L5+Beauty
+* Multi language file manager package based on https://web.archive.org/web/20160425103612/http://laravelcoding.com:80/blog/laravel-5-beauty-upload-manager?tag=L5+Beauty
 * Using ```intervention/image``` to create image transforms (inspired by ```matriphe/imageupload```).
 * Integration with Dropbox for loading files directly from Dropbox
 
@@ -14,7 +14,7 @@
 composer require iemand002/filemanager
 ```
 
-### Register (when not using auto discover)
+### Register (when not using autodiscover)
 Register the provider in your app.php config
 ```php
 'providers' => [
@@ -66,6 +66,9 @@ To add more middlewares and change the prefix change the config file.
 <br><br>
 Get the url of the uploaded file in your blade via the uploadId: ```{{ Filemanager::getUrl(123) }}```<br>
 If you wish to show a transformed version of an image add the optional ```$transfromHandle```: ```{{ Filemanager::getUrl(123, "transformHandle") }}```<br>
+<br>
+Get the image width and height via the uploadId: ```{{ Filemanager::getWidth(123) }}``` and ```{{ Filemanager::getHeight(123) }}```<br>
+Also compatable with the transform: ```{{ Filemanager::getWidth(123, "transformHandle") }}``` and ```{{ Filemanager::getHeight(123, "transformHandle") }}```<br>
 <br>
 Want to sync earlier uploaded files in the folder with the database? Surf to ```yourwebsite.io/admin/sync``` to add missing files in the database.
 

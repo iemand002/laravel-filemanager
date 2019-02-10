@@ -44,12 +44,28 @@
                     </div>
                 </div>
             </div>
+            <div class="row">
+                <h3>CKEditor</h3>
+                <label for="body">Text</label>
+                <textarea id="body"></textarea>
+
+
+            </div>
         </div>
     </div>
 @endsection
 
 @section('js')
-
+    <script src="https://cdn.ckeditor.com/4.11.2/standard/ckeditor.js"></script>
+    <script>
+        $(function () {
+            CKEDITOR.replace('body', {
+                // customConfig: '/js/ckeditor/config.js',
+                filebrowserImageBrowseUrl: '{{route('filemanager.picker')}}',
+                filebrowserBrowseUrl: '{{route('filemanager.picker')}}',
+            });
+        });
+    </script>
     <script>
         // Listen to localstorage change
         $(window).on('storage', message_receive);

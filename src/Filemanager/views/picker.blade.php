@@ -300,10 +300,10 @@
                     // use CKEditor 3.0 + integration method
                     if (window.opener) {
                         // Popup
-                        window.opener.CKEDITOR.tools.callFunction(getUrlParam('CKEditorFuncNum'), webpath + folder + file);
+                        window.opener.CKEDITOR.tools.callFunction(getUrlParam('CKEditorFuncNum'), webpath + data.folder + $(this).data('fileName'));
                     } else {
                         // Modal (in iframe)
-                        parent.CKEDITOR.tools.callFunction(getUrlParam('CKEditorFuncNum'), webpath + folder + file);
+                        parent.CKEDITOR.tools.callFunction(getUrlParam('CKEditorFuncNum'), webpath + data.folder + $(this).data('fileName'));
                         parent.CKEDITOR.tools.callFunction(getUrlParam('CKEditorCleanUpFuncNum'));
                     }
                 } else {

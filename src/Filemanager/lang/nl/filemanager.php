@@ -19,8 +19,15 @@ return [
     'image' => 'Afbeelding',
     'please_confirm' => 'Bevestig a.u.b.',
     'are_you_sure_del' => 'Ben je zeker dat je dit wilt verwijderen:',
-    'choose_picture' => 'Kies foto',
+    'choose_picture' => 'Kies een foto',
+    'change_picture' => 'Wijzig foto',
+    'choose_file' => "Kies een bestand",
 
+    'check_all' => "Selecteer/Deselecteer alles",
+    'check' => "Selecteer/Deselecteer",
+    'select' => "Gebruik selectie",
+
+    'close' => "Sluit",
     'delete' => 'Delete',
     'create' => 'Maak',
     'cancel' => 'Annuleer',

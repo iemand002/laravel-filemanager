@@ -13,7 +13,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">
-                    {{trans('filemanager::filemanager.cancel')}}
+                    {{trans('filemanager::filemanager.close')}}
                 </button>
             </div>
         </div>

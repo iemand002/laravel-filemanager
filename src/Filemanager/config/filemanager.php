@@ -37,9 +37,6 @@ return [
     'content_section' => 'content',
     'include_container' => 'normal', // options: normal | fluid | none
 
-    // Picker: trigger onchange?
-    'on_change' => false,
-
     // JQuery datatables from https://datatables.net/
     'jquery_datatables' => [
         'use' => true,

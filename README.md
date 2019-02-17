@@ -1,12 +1,13 @@
 # laravel-filemanager
 * Multi language file manager package based on https://web.archive.org/web/20160425103612/http://laravelcoding.com:80/blog/laravel-5-beauty-upload-manager?tag=L5+Beauty
 * Using ```intervention/image``` to create image transforms (inspired by ```matriphe/imageupload```).
+* Now able to select multiple files at once using localstorage
 * Integration with Dropbox for loading files directly from Dropbox
 
 ## Installation
 ### Requirements
 * Laravel 5.2 (version 0.x), Laravel 5.5+ (version 1.x)
-* Twitter Bootstrap
+* Twitter Bootstrap 3
 * Jquery
 
 ### Composer
@@ -62,9 +63,9 @@ After that add the relation to the `Social` model in your `User` model:
 Run the migration using ```php artsan migrate```<br/>
 Just surf to ```yourwebsite.io/admin/upload```<br/>
 By default it has the ```web``` middleware for Laravel 5.2+.<br/>
-To add more middlewares and change the prefix change the config file.
+To change the required middlewares and the prefix change the config file.
 <br><br>
-Get the url of the uploaded file in your blade via the uploadId: ```{{ Filemanager::getUrl(123) }}```<br>
+Get the url of the uploaded file in your blade template via the uploadId: ```{{ Filemanager::getUrl(123) }}```<br>
 If you wish to show a transformed version of an image add the optional ```$transfromHandle```: ```{{ Filemanager::getUrl(123, "transformHandle") }}```<br>
 <br>
 Get the image width and height via the uploadId: ```{{ Filemanager::getWidth(123) }}``` and ```{{ Filemanager::getHeight(123) }}```<br>
@@ -72,9 +73,24 @@ Also compatable with the transform: ```{{ Filemanager::getWidth(123, "transformH
 <br>
 Want to sync earlier uploaded files in the folder with the database? Surf to ```yourwebsite.io/admin/sync``` to add missing files in the database.
 
-## Demo
-See the demo folder on how to use it.
+### Demo
+Create a route like the following to see an example usage.
+````php
+Route::get('demo',function () {
+    return view('iemand002/filemanager::demo.demo');
+});
+````
 
 ## Build-in languages
 * Dutch (nl)
 * English (en)
+
+## Changelog
+2.0.0  
+Added: 
+* Multiple files select option
+
+Changed:  
+* Now using localstorage to communicate te data back to the main view
+
+Check previous changes in CHANGELOG.md

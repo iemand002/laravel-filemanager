@@ -20,7 +20,14 @@ return [
     'please_confirm' => 'Please confirm',
     'are_you_sure_del' => 'Are you sure you want to delete:',
     'choose_picture' => 'Choose picture',
+    'change_picture' => 'Change picture',
+    'choose_file' => "Choose a file",
 
+    'check_all' => "Select/Deselect all",
+    'check' => "Select/Deselect",
+    'select' => "Use selected",
+
+    'close' => "Close",
     'delete' => 'Delete',
     'create' => 'Create',
     'cancel' => 'Cancel',

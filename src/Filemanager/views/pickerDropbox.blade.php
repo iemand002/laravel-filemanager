@@ -1,12 +1,22 @@
 @extends(config('filemanager.extend_layout.picker'))
 @section('pagetitle')
-    {{trans('filemanager::filemanager.file_manager')}}
+    {{trans('filemanager::filemanager.file_manager_dropbox')}}
 @endsection
 @section(config('filemanager.css_section'))
     @if(config('filemanager.jquery_datatables.use')&&config('filemanager.jquery_datatables.cdn'))
         <link href="https://cdn.datatables.net/1.10.11/css/dataTables.bootstrap.min.css " type="text/css"
               rel="stylesheet">
     @endif
+    <style>
+        .table > tbody > tr > td.checkbox-label, .table > thead > tr > th.checkbox-label {
+            padding: 0;
+        }
+        td.checkbox-label label, th.checkbox-label label {
+            padding: 8px;
+            margin: 0;
+            display: block;
+        }
+    </style>
 @endsection
 @section(config('filemanager.content_section'))
     <div class="container-fluid">
@@ -14,7 +24,7 @@
         {{-- Top Bar --}}
         <div class="row page-title-row">
             <div class="col-md-6">
-                <h3 class="pull-left">{{trans('filemanager::filemanager.dropbox')}} </h3>
+                <h3 class="pull-left">{{trans('filemanager::filemanager.file_manager_dropbox')}} </h3>
                 <div class="pull-left">
                     <ul class="breadcrumb">
                         <?php $link = route('filemanager.picker') . "?folder=";
@@ -26,7 +36,7 @@
                             $link .= "&file=" . $_GET['file'];
                         ?>
                         <li><a href="{{$link}}">root</a></li>
-                        <?php $link = route('filemanager.pickerDropbox') . "?folder=";
+                        <?php $link = route('filemanager.pickerSocial','dropbox') . "?folder=";
                         if (isset($_GET['CKEditor']))
                             $link .= "&CKEditor=my-editor&CKEditorFuncNum=0";
                         if (isset($_GET['id']))
@@ -38,7 +48,7 @@
 
                             @for($i=0;$i<sizeof($folder);$i++)
                                 @if($folder[$i]!='')
-                                    <?php $link = route('filemanager.pickerDropbox') . "?folder=". substr($folder[$i],1);
+                                    <?php $link = route('filemanager.pickerSocial','dropbox') . "?folder=". substr($folder[$i],1);
                                     if (isset($_GET['CKEditor']))
                                         $link .= "&CKEditor=my-editor&CKEditorFuncNum=0";
                                     if (isset($_GET['id']))
@@ -51,7 +61,7 @@
                                         <div class="active section">{{$folder_split[$i]}}</div>
                                     @else
                                         <a class="section"
-                                           href="{{route('filemanager.pickerDropbox')}}">{{$folder_split[$i]}}</a>
+                                           href="{{route('filemanager.pickerSocial','dropbox')}}">{{$folder_split[$i]}}</a>
                                     @endif
                                 @endif
                             @endfor
@@ -71,6 +81,14 @@
                     <table id="uploads-table" class="table table-striped table-bordered">
                         <thead>
                         <tr>
+                            @if(isset($_GET['multi']))
+                                <th data-sortable="false" class="checkbox-label">
+                                    <label for="check-all">
+                                        <input type="checkbox" id="check-all"><span
+                                                class="sr-only">{{trans('filemanager::filemanager.check_all')}}</span>
+                                    </label>
+                                </th>
+                            @endif
                             <th>{{trans('filemanager::filemanager.name')}}</th>
                             <th>{{trans('filemanager::filemanager.type')}}</th>
                             <th>{{trans('filemanager::filemanager.date')}}</th>
@@ -79,46 +97,70 @@
                         </tr>
                         </thead>
                         <tbody>
-
                         @foreach($data->entries as $entry)
                             @if(array_key_exists('rev',$entry))
-                                @if(array_key_exists('media_info',$entry)&&$entry->media_info->metadata->{'.tag'}=='photo')
-                                    <tr>
-                                        <td>
-                                            <a href="javascript:useFile('{{$entry->id}}','{{ $entry->name }}')">
-                                                @if (array_key_exists('media_info',$entry)&&$entry->media_info->metadata->{'.tag'}=='photo')
-                                                    <i class="fa fa-file-image-o fa-lg fa-fw"></i>
-                                                @else
-                                                    <i class="fa fa-file-o fa-lg fa-fw"></i>
-                                                @endif
-                                                {{ $entry->name }}
-                                            </a>
+                                <tr>
+                                    @if(isset($_GET['multi']))
+                                        <td class="checkbox-label">
+                                            <label for="check{{$loop->index}}">
+                                                <input type="checkbox" name="files[]" id="check{{$loop->index}}"
+                                                       data-file-id="{{$entry->id}}" data-file-name="{{ $entry->name }}">
+                                                <span class="sr-only">{{trans('filemanager::filemanager.check')}}</span>
+                                            </label>
                                         </td>
-                                        <td>{{ array_key_exists('media_info',$entry)&&$entry->media_info->metadata->{'.tag'}=='photo' ? 'image' : 'Unknown' }}</td>
-                                        <td>{{ $entry->server_modified }}</td>
-                                        <td>{{ human_filesize($entry->size) }}</td>
-                                        <td>
+                                    @endif
+                                    <td>
+                                        <a class="file" href="#" data-file-id="{{$entry->id}}"
+                                           data-file-name="{{ $entry->name }}">
                                             @if (array_key_exists('media_info',$entry)&&$entry->media_info->metadata->{'.tag'}=='photo')
-                                                <button type="button" class="btn btn-xs btn-success"
-                                                        onclick="preview_image('{{route('filemanager.getDropboxPicture',[$entry->id])}}')">
-                                                    <i class="fa fa-eye fa-lg"></i>
-                                                    {{trans('filemanager::filemanager.preview')}}
-                                                </button>
+                                                <i class="fa fa-file-image-o fa-lg fa-fw"></i>
+                                            @else
+                                                <i class="fa fa-file-o fa-lg fa-fw"></i>
                                             @endif
-                                        </td>
-
-                                    </tr>
-                                @endif
+                                            {{ $entry->name }}
+                                        </a>
+                                    </td>
+                                    <td>{{ $mimeType = fileMimeType($entry->path_display) }}</td>
+                                    <td>{{ \Carbon\Carbon::createFromTimeString($entry->server_modified)->format('j-M-y g:ia') }}</td>
+                                    <td>{{ human_filesize($entry->size) }}</td>
+                                    <td>
+                                        @if (is_image($mimeType))
+                                            <button type="button" class="btn btn-xs btn-success"
+                                                    onclick="preview_image('{{route('filemanager.getPicture',['provider'=>'dropbox', $entry->id])}}')">
+                                                <i class="fa fa-eye fa-lg"></i>
+                                                {{trans('filemanager::filemanager.preview')}}
+                                            </button>
+                                        @endif
+                                    </td>
+                                </tr>
                             @else
-                                {{--<li class="eight wide tablet six wide computer column">--}}
-                                    {{--<a href="{{route('picture.import.dropbox',['album'=>$album->slug,'folder_name'=>str_replace('%2F','/',rawurlencode(substr($entry->path_lower,1)))])}}">--}}
-                                        {{--<i class="big folder icon"></i>--}}
-                                        {{--<span>{{$entry->name}}</span>--}}
-                                    {{--</a>--}}
-                                {{--</li>--}}
+                                <tr>
+                                    @if(isset($_GET['multi']))
+                                        <td>&nbsp;</td>
+                                    @endif
+                                    <td>
+                                        <?php $link = route('filemanager.pickerSocial',['dropbox']) . "?folder=" . str_replace('%2F','/',rawurlencode(substr($entry->path_lower,1)));
+                                        if (isset($_GET['CKEditor']))
+                                            $link .= "&CKEditor=my-editor&CKEditorFuncNum=0";
+                                        if (isset($_GET['id']))
+                                            $link .= "&id=" . $_GET['id'];
+                                        if (isset($_GET['file']))
+                                            $link .= "&file=" . $_GET['file'];
+                                        if (isset($_GET['multi']))
+                                            $link .= "&multi=true";
+                                        ?>
+                                        <a href="{{$link}}">
+                                            <i class="fa fa-folder fa-lg fa-fw"></i>
+                                            {{$entry->name}}
+                                        </a>
+                                    </td>
+                                        <td>{{trans('filemanager::filemanager.folder')}}</td>
+                                        <td>-</td>
+                                        <td>-</td>
+                                        <td>-</td>
+                                </tr>
                             @endif
                         @endforeach
-
 
 
                         </tbody>
@@ -139,20 +181,6 @@
     @endif
     <script>
 
-        // Confirm file delete
-        function delete_file(name) {
-            $("#delete-file-name1").html(name);
-            $("#delete-file-name2").val(name);
-            $("#modal-file-delete").modal("show");
-        }
-
-        // Confirm folder delete
-        function delete_folder(name) {
-            $("#delete-folder-name1").html(name);
-            $("#delete-folder-name2").val(name);
-            $("#modal-folder-delete").modal("show");
-        }
-
         // Preview image
         function preview_image(path) {
             $("#preview-image").attr("src", path);
@@ -163,9 +191,14 @@
         $(function () {
             $("#uploads-table").DataTable({
                 @if(config('app.locale')=='nl')
+                // Load translations
                 "language": {
                     "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Dutch.json"
-                }
+                },
+                @endif
+                @if(isset($_GET['multi']))
+                // Change default order column
+                "order": [[1, 'asc']]
                 @endif
             });
         });

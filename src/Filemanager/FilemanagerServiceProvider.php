@@ -20,9 +20,9 @@ class FilemanagerServiceProvider extends ServiceProvider
             __DIR__ . '/config/filemanager.php' => config_path('filemanager.php')
         ], 'config');
 
-        $this->loadRoutesFrom(__DIR__.'/routes.php');
+        $this->loadRoutesFrom(__DIR__ . '/routes.php');
 
-        $this->loadMigrationsFrom(__DIR__.'/database/migrations');
+        $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
 
         $this->publishes([
             __DIR__ . '/database/migrations' => base_path('database/migrations')
@@ -31,7 +31,7 @@ class FilemanagerServiceProvider extends ServiceProvider
         $this->loadTranslationsFrom(__DIR__ . '/lang', 'filemanager');
 
         $this->publishes([
-            __DIR__.'/lang' => resource_path('lang/vendor/filemanager'),
+            __DIR__ . '/lang' => resource_path('lang/vendor/filemanager'),
         ], 'translations');
 
         $this->loadViewsFrom(__DIR__ . '/views', 'iemand002/filemanager');
@@ -54,6 +54,8 @@ class FilemanagerServiceProvider extends ServiceProvider
         include __DIR__ . '/routes.php';
         include __DIR__ . '/filemanager-helpers.php';
         $this->app->make('Iemand002\Filemanager\Controllers\UploadController');
+        $this->app->make('Iemand002\Filemanager\Controllers\SocialController');
+        $this->app->make('Iemand002\Filemanager\Controllers\CloudController');
 
         $this->registerHtmlBuilder();
 

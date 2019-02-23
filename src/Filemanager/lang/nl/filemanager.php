@@ -35,6 +35,8 @@ return [
     'whoops' => 'Oeps!',
 
     'connect_dropbox_btn' => 'Connect Dropbox',
+    'file_manager_dropbox' => 'Dropbox (File manager)',
+    'social' => 'Social',
     'provider_not_found' => 'Provider :provider is niet geconfigureerd',
     'logged_in_social_provider' => 'Ingelogd bij :provider',
 

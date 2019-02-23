@@ -27,6 +27,13 @@ function is_image($mimeType)
     return starts_with($mimeType, 'image/');
 }
 
+function fileMimeType($path){
+    $mimeDetect = new \Dflydev\ApacheMimeTypes\PhpRepository();
+    return $mimeDetect->findType(
+        pathinfo(strtolower($path), PATHINFO_EXTENSION)
+    );
+}
+
 function is_dropbox_configured(){
     if(config('services.dropbox.client_id') && config('services.dropbox.client_secret') && config('services.dropbox.redirect')){
         return true;

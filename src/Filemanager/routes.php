@@ -9,12 +9,12 @@ Route::group(['middleware' => array_merge(['web'], config('filemanager.middlewar
     Route::delete('/upload/folder', ['as' => 'filemanager.delete-folder', 'uses' => '\Iemand002\Filemanager\Controllers\UploadController@deleteFolder']);
     Route::get('/sync', ['as' => 'filemanager.save-legacy', 'uses' => '\Iemand002\Filemanager\Controllers\UploadController@sync']);
 
-    Route::get('/upload-picker/dropbox', ['as' => 'filemanager.pickerDropbox', 'uses' => '\Iemand002\Filemanager\Controllers\DropboxController@browseDropbox']);
+    Route::get('/upload-picker/{provider}/{folder_name?}', '\Iemand002\Filemanager\Controllers\CloudController@browseProvider')->where('folder_name', '(.*)')->name('filemanager.pickerSocial');
 
 });
 
 Route::group(['middleware' => ['web']], function () {
     Route::get('/social/redirect/{provider}', ['as' => 'social.redirect', 'uses' => '\Iemand002\Filemanager\Controllers\SocialController@getSocialRedirect']);
     Route::get('/social/handle/{provider}', ['as' => 'social.handle', 'uses' => '\Iemand002\Filemanager\Controllers\SocialController@getSocialHandle']);
-    Route::get('picture/dropbox/{id}', 'PictureController@getDropboxPicture')->name('filemanager.getDropboxPicture');
+    Route::get('/upload/picture/{provider}/{id}', '\Iemand002\Filemanager\Controllers\CloudController@getPicture')->name('filemanager.getPicture');
 });

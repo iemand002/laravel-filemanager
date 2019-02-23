@@ -122,14 +122,19 @@
 
                         @if(is_dropbox_loggedIn())
                             <tr>
+                                @if(isset($_GET['multi']))
+                                    <td>&nbsp;</td>
+                                @endif
                                 <td>
-                                    <?php $link = route('filemanager.pickerDropbox') . "?folder=";
+                                    <?php $link = route('filemanager.pickerSocial',["dropbox",""]) . "?folder=";
                                     if (isset($_GET['CKEditor']))
                                         $link .= "&CKEditor=my-editor&CKEditorFuncNum=0";
                                     if (isset($_GET['id']))
                                         $link .= "&id=" . $_GET['id'];
                                     if (isset($_GET['file']))
                                         $link .= "&file=" . $_GET['file'];
+                                    if (isset($_GET['multi']))
+                                        $link .= "&multi=true";
                                     ?>
                                     <a href="{{$link}}">
                                         <i class="fa fa-dropbox fa-lg fa-fw"></i>

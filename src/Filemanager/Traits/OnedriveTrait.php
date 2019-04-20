@@ -4,21 +4,19 @@ namespace Iemand002\Filemanager\Traits;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
+use Iemand002\Filemanager\models\Social;
+use Iemand002\Filemanager\models\Uploads;
+use Intervention\Image\Facades\Image;
 
 trait OnedriveTrait
 {
     /**
-     * @param $album
      * @param string $folders
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\RedirectResponse|\Illuminate\View\View
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    function browseOneDrive($album, $folders = "")
+    function browseOneDrive($folders = "")
     {
-        $pictureIds = [];
-        foreach ($album->picturesAddedByWithTrashed(auth()->id()) as $pic) {
-            $pictureIds[] = $pic->url;
-        }
         $folders = explode('-', $folders);
 
         $social = Social::where('user_id', auth()->id())->where('provider', 'graph')->first();
@@ -45,20 +43,20 @@ trait OnedriveTrait
                 $data = \GuzzleHttp\json_decode($response->getBody()->getContents());
 
                 if ($data->value) {
-                    return view('picture.import.onedrive', compact('data', 'folders', 'album', 'pictureIds'));
+                    return view('iemand002/filemanager::pickerOnedrive', compact('data', 'folders'));
                 } else {
                     // folder is empty, redirect to previous folder
                     array_pop($folders);
                     $folders = implode("-", $folders);
                     \Session::flash('info', 'Folder is empty, redirect to previous folder');
-                    return redirect(route('picture.import', ['provider' => 'onedrive', 'album' => $album->slug, 'folders' => $folders]));
+                    return redirect(route('filemanager.pickerCloud', ['provider' => 'onedrive', 'folders' => $folders]));
                 }
 
             } catch (BadResponseException $e) {
 
                 if ($e->getCode() == 401) {
-                    if ($this->refreshToken($social, route('picture.import', ['provider' => 'onedrive', $album->slug]))) {
-                        return $this->browseOneDrive($album, $folder = "");
+                    if ($this->refreshToken($social, route('filemanager.pickerCloud', ['provider' => 'onedrive']))) {
+                        return $this->browseOneDrive($folder = "");
                     }
                 }
                 dd($e);
@@ -116,24 +114,23 @@ trait OnedriveTrait
      */
     function getOnedrivePicture($id)
     {
-        $pic = new Picture();
-        $pic->url = $id;
+        $pic = new Uploads();
+        $pic->key = $id;
         $social = Social::where('user_id', auth()->id())->where('provider', 'graph')->first();
         return $this->getOnedrivePic($pic, 'big', $social);
     }
 
     /**
-     * TODO: handle deleted onedrive pictures
-     * @param Picture $pic
+     * @param Uploads $pic
      * @param $size
      * @param $social
      * @return int|mixed
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    private function getOnedrivePic(Picture $pic, $size, $social)
+    private function getOnedrivePic(Uploads $pic, $size, $social)
     {
         $type = 'default';
-        $url = 'https://graph.microsoft.com/v1.0/me/drive/items/' . $pic->url . '/thumbnails';
+        $url = 'https://graph.microsoft.com/v1.0/me/drive/items/' . $pic->key . '/thumbnails';
         switch ($size) {
             case 'icon':
                 $size = "smallSquare";
@@ -183,7 +180,7 @@ trait OnedriveTrait
                     }
                 }
                 if ($e->getCode() == 404) {
-                    $this->removePicture($pic);
+                    // TODO: handle deleted items
                     return 'removed';
                 }
                 return ($e->getCode());

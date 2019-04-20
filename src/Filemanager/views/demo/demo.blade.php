@@ -85,7 +85,7 @@
                 var upload_id = document.getElementById(data.id);
                 upload_id.value = file.fileId;
                 document.getElementById(data.file).value = folder + file.fileName;
-                handle_image_change(parseInt(upload_id.dataset.count));
+                handle_image_change(parseInt(upload_id.dataset.count), data.webPath);
                 if (count + 1 === parseInt(upload_id.dataset.count)){
                     // add a new dummy if needed
                     count++;
@@ -98,7 +98,7 @@
                     count++;
                     document.getElementById('upload_id' + count).value = file.fileId;
                     document.getElementById('picture' + count).value = folder + file.fileName;
-                    handle_image_change(count);
+                    handle_image_change(count, data.webPath);
                     add_dummy(count + 1);
                 }
             }
@@ -106,13 +106,13 @@
 
         }
 
-        function handle_image_change(count) {
+        function handle_image_change(count, path) {
             // preview the image
             $("#image-preview" + count).attr("src", function () {
 
                 var value = $("#picture" + count).val();
                 if (value.substr(0, 4) !== 'http') {
-                    value = '/uploads' + value;
+                    value = path + value;
                 }
                 $("#picker" + count).attr("onclick", function () {
                     return "window.open('{{route('filemanager.picker')}}?id=upload_id" + count + "&file=picture" + count + "','imagepicker', 'width=1000,height=500,scrollbars=yes,toolbar=no,location=no'); return false";

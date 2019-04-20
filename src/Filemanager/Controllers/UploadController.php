@@ -2,7 +2,6 @@
 
 namespace Iemand002\Filemanager\Controllers;
 
-use Exception;
 use Iemand002\Filemanager\Requests\UploadFileRequest;
 use Iemand002\Filemanager\Requests\UploadNewFolderRequest;
 use Iemand002\Filemanager\Services\UploadsManager;
@@ -15,7 +14,6 @@ use App\Http\Controllers\Controller;
 
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Response;
-use Illuminate\Support\Facades\Storage;
 
 
 class UploadController extends Controller

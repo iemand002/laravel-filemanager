@@ -10,7 +10,6 @@ use Iemand002\Filemanager\models\Uploads;
 trait DropboxTrait
 {
     /**
-     * @param $album
      * @param string $folder_name
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\RedirectResponse|\Illuminate\View\View
      * @throws \GuzzleHttp\Exception\GuzzleException
@@ -58,6 +57,7 @@ trait DropboxTrait
     /**
      * @param $id
      * @return int|mixed
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     function getDropboxPicture($id)
     {
@@ -68,7 +68,7 @@ trait DropboxTrait
     }
 
     /**
-     * @param Picture $pic
+     * @param Uploads $upload
      * @param $size
      * @param $social
      * @return int|mixed
@@ -109,7 +109,7 @@ trait DropboxTrait
             } catch (BadResponseException $e) {
 
                 if ($e->getCode() == 409) {
-                    $this->removePicture($upload);
+                    // TODO: handle deleted item
                     return 'removed';
                 }
                 return ($e->getCode());

@@ -11,6 +11,7 @@ class CreateSocialLoginsTable extends Migration {
     public function __construct()
     {
         $this->table = config('filemanager.social_table', 'social_logins');
+        $this->usersTable = config('filemanager.users_table','users');
     }
 
 	public function up()
@@ -21,8 +22,15 @@ class CreateSocialLoginsTable extends Migration {
                 $table->integer('user_id')->unsigned();
                 $table->string('provider');
                 $table->string('social_id');
-                $table->string('token');
+                $table->text('token');
+                $table->integer('expires')->nullable();
+                $table->text('refresh')->nullable();
                 $table->timestamps();
+            });
+            Schema::table($this->table, function(Blueprint $table) {
+                $table->foreign('user_id')->references('id')->on($this->usersTable)
+                    ->onDelete('restrict')
+                    ->onUpdate('restrict');
             });
         }
     }
@@ -30,6 +38,9 @@ class CreateSocialLoginsTable extends Migration {
 	public function down()
 	{
         if (Schema::hasTable($this->table)) {
+            Schema::table($this->table, function(Blueprint $table) {
+                $table->dropForeign($this->table . '_user_id_foreign');
+            });
             Schema::drop($this->table);
         }
 	}

@@ -6,7 +6,7 @@
 
 ## Installation
 ### Requirements
-* Laravel 5.2 (version 0.x), Laravel 5.5+ (version 1.x)
+* Laravel 5.2 (version 0.x), Laravel 5.5+ (version 1.x/2.x)
 * Twitter Bootstrap 3
 * Jquery
 
@@ -28,28 +28,32 @@ Register the provider in your app.php config
 ```
 
 ### Publish configurations
-Configuration file (config/filemanager.php)
+Configuration file  
+<small>_config/filemanager.php_</small>
 ```bash
 php artisan vendor:publish --provider="Iemand002\Filemanager\FilemanagerServiceProvider" --tag="config"
 ```
 
-Migration file (optional) (2017_12_29_004110_create_image_upload_table.php and 2018_05_12_161010_create_social_logins_table)
+Migration file (optional)  
+<small>_2017_12_29_004110_create_image_upload_table.php and 2018_05_12_161010_create_social_logins_table and 2019_02_17_141025_alter_image_upload_table.php_</small>
 ```bash
 php artisan vendor:publish --provider="Iemand002\Filemanager\FilemanagerServiceProvider" --tag="migration"
 ```
 
-Views (vendor/iemand002/filemanager)
+Views  
+<small>_vendor/iemand002/filemanager_</small>
 ```bash
 php artisan vendor:publish --provider="Iemand002\Filemanager\FilemanagerServiceProvider" --tag="views"
 ```
 
-Translations (lang/vendor/filemanager)
+Translations  
+<small>_lang/vendor/filemanager_</small>
 ```bash
 php artisan vendor:publish --provider="Iemand002\Filemanager\FilemanagerServiceProvider" --tag="translations"
 ```
 
-### Configure Dropbox (optional)
-This package uses `socialiteproviders/dropbox` for the Dropbox login. To get it working follow step 2 - 4 from there documentation.
+### Configure Clouds: Dropbox/OneDrive (optional)
+This package uses [`socialiteproviders/dropbox`](https://socialiteproviders.netlify.com/providers/dropbox.html) for the Dropbox login and/or [`socialiteproviders/graph`](https://socialiteproviders.netlify.com/providers/microsoft-graph.html). To get it working follow step 2 - 4 from there documentation.
 <br><br>
 After that add the relation to the `Social` model in your `User` model:
 ```php
@@ -85,12 +89,14 @@ Route::get('demo',function () {
 * Dutch (nl)
 * English (en)
 
-## Changelog
-2.0.0  
-Added: 
-* Multiple files select option
+## TODO
+* Find out what's wrong with the graph login, it works, but giving errors sometimes
+* Clouds vs. transforms
+* Cloud remove reference in database if file is removed from the cloud
 
-Changed:  
-* Now using localstorage to communicate te data back to the main view
+## Changelog
+2.1.0  
+Added: 
+* Dropbox and OneDrive integrations
 
 Check previous changes in CHANGELOG.md

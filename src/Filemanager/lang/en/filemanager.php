@@ -34,7 +34,14 @@ return [
     'success' => 'Success!',
     'whoops' => 'Whoops!',
 
+    // Cloud
     'connect_dropbox_btn' => 'Connect Dropbox',
+    'file_manager_dropbox' => 'Dropbox (File manager)',
+    'connect_onedrive_btn' => 'Connect OneDrive',
+    'file_manager_onedrive' => 'OneDrive (File manager)',
+    'cloud' => 'Cloud',
+    'provider_not_found' => 'Provider :provider isn\'t configured',
+    'logged_in_social_provider' => 'Logged in at :provider',
 
     // UploadManager
     'folder_exists' => "Folder ':folder' already exists.",

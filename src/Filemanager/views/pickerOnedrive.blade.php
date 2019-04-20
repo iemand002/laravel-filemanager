@@ -1,6 +1,6 @@
 @extends(config('filemanager.extend_layout.picker'))
 @section('pagetitle')
-    {{trans('filemanager::filemanager.file_manager_dropbox')}}
+    {{trans('filemanager::filemanager.file_manager_onedrive')}}
 @endsection
 @section(config('filemanager.css_section'))
     @if(config('filemanager.jquery_datatables.use')&&config('filemanager.jquery_datatables.cdn'))
@@ -35,29 +35,32 @@
         {{-- Top Bar --}}
         <div class="row page-title-row">
             <div class="col-md-6">
-                <h3 class="pull-left">{{trans('filemanager::filemanager.file_manager_dropbox')}} </h3>
+                <h3 class="pull-left">{{trans('filemanager::filemanager.file_manager_onedrive')}} </h3>
                 <div class="pull-left">
                     <ul class="breadcrumb">
                         @php
-                            $link = route('filemanager.picker') . "?folder=" . $urlParams;
+                            $link = route('filemanager.picker') . "?folders=" . $urlParams;
                         @endphp
                         <li><a href="{{$link}}">root</a></li>
                         @php
-                            $link = route('filemanager.pickerCloud','dropbox') . "?folder=&cloud=dropbox". $urlParams;
+                            $link = route('filemanager.pickerCloud','onedrive') . "?folder=&cloud=onedrive". $urlParams;
+                            $parent=explode('/',$data->value[0]->parentReference->path);
                         @endphp
-                        <li><a href="{{$link}}"><i class="fa fa-dropbox"></i> Dropbox</a></li>
-                        @for($i=0;$i<sizeof($folder);$i++)
-                            @if($folder[$i]!='')
+                        <li><a href="{{$link}}"><i class="fa fa-windows"></i> OneDrive</a></li>
+                        @php $foldersUrl=$foldersByName='' @endphp
+                        @foreach($folders as $folder)
+                            @if($folder!='')
                                 @php
-                                    $link = route('filemanager.pickerCloud','dropbox') . "?folder=". substr($folder[$i],1) . '&cloud=dropbox' . $urlParams;
+                                    $foldersUrl=($foldersUrl!=''?$foldersUrl.'-':'').$folder;
+                                    $foldersByName = urldecode($parent[3+$loop->index]);
                                 @endphp
-                                @if($i==sizeof($folder)-1)
-                                    <li class="active">{{$folder_split[$i]}}</li>
+                                @if(end($folders)==$folder)
+                                    <li class="active">{{urldecode($parent[3+$loop->index])}}</li>
                                 @else
-                                    <li><a href="{{$link}}">{{$folder_split[$i]}}</a></li>
+                                    <li><a href="{{route('filemanager.pickerCloud','onedrive') . "?folder=" . $foldersByName . "&folders=".$foldersUrl . '&cloud=onedrive' . $urlParams }}">{{urldecode($parent[3+$loop->index])}}</a></li>
                                 @endif
                             @endif
-                        @endfor
+                        @endforeach
                     </ul>
                 </div>
             </div>
@@ -93,10 +96,10 @@
                         </tr>
                         </thead>
                         <tbody>
-                        @foreach($data->entries as $entry)
-                            @if(array_key_exists('rev',$entry))
+                        @foreach($data->value as $entry)
+                            @if(array_key_exists('file',$entry))
                                 @php
-                                    $mimeType = fileMimeType($entry->path_display)
+                                    $mimeType = $entry->file->mimeType
                                 @endphp
                                 <tr>
                                     @if(isset($_GET['multi']))
@@ -104,7 +107,7 @@
                                             <label for="check{{$loop->index}}">
                                                 <input type="checkbox" name="files[]" id="check{{$loop->index}}"
                                                        data-file-id="{{$entry->id}}" data-file-name="{{ $entry->name }}"
-                                                       data-file-date="{{ \Carbon\Carbon::createFromTimeString($entry->client_modified)->format('Y-m-d H:i:s') }}"
+                                                       data-file-date="{{ \Carbon\Carbon::createFromTimeString($entry->fileSystemInfo->createdDateTime)->format('Y-m-d H:i:s') }}"
                                                 >
                                                 <span class="sr-only">{{trans('filemanager::filemanager.check')}}</span>
                                             </label>
@@ -113,9 +116,9 @@
                                     <td>
                                         <a class="file" href="#" data-file-id="{{$entry->id}}"
                                            data-file-name="{{ $entry->name }}"
-                                           data-file-date="{{ \Carbon\Carbon::createFromTimeString($entry->client_modified)->format('Y-m-d H:i:s') }}"
+                                           data-file-date="{{ \Carbon\Carbon::createFromTimeString($entry->fileSystemInfo->createdDateTime)->format('Y-m-d H:i:s') }}"
                                         >
-                                            @if (is_image($mimeType))
+                                            @if (array_key_exists('image',$entry))
                                                 <i class="fa fa-file-image-o fa-lg fa-fw"></i>
                                             @else
                                                 <i class="fa fa-file-o fa-lg fa-fw"></i>
@@ -124,12 +127,12 @@
                                         </a>
                                     </td>
                                     <td>{{ $mimeType }}</td>
-                                    <td>{{ \Carbon\Carbon::createFromTimeString($entry->client_modified)->format('j-M-y g:ia') }}</td>
+                                    <td>{{ \Carbon\Carbon::createFromTimeString($entry->fileSystemInfo->createdDateTime)->format('j-M-y g:ia') }}</td>
                                     <td>{{ human_filesize($entry->size) }}</td>
                                     <td>
-                                        @if (is_image($mimeType))
+                                        @if (array_key_exists('image',$entry))
                                             <button type="button" class="btn btn-xs btn-success"
-                                                    onclick="preview_image('{{route('filemanager.getPicture',['provider'=>'dropbox', $entry->id])}}')">
+                                                    onclick="preview_image('{{route('filemanager.getPicture',['provider'=>'onedrive', $entry->id])}}')">
                                                 <i class="fa fa-eye fa-lg"></i>
                                                 {{trans('filemanager::filemanager.preview')}}
                                             </button>
@@ -143,7 +146,7 @@
                                     @endif
                                     <td>
                                         @php
-                                            $link = route('filemanager.pickerCloud',['dropbox']) . "?folder=" . str_replace('%2F','/',rawurlencode(substr($entry->path_lower,1))) . '&cloud=dropbox'. $urlParams;
+                                            $link = route('filemanager.pickerCloud',['onedrive']) . "?folder=" . ($foldersByName==''?$entry->name:$foldersByName . "/" . $entry->name) . "&folders=" . ($foldersUrl!=''?$foldersUrl.'-':'').$entry->id . '&cloud=onedrive'. $urlParams;
                                         @endphp
                                         <a href="{{$link}}">
                                             <i class="fa fa-folder fa-lg fa-fw"></i>

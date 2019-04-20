@@ -22,6 +22,21 @@
 @endsection
 
 @section(config('filemanager.content_section'))
+    @php
+        $urlParams = '';
+        if (isset($_GET['CKEditor'])) {
+            $urlParams .= "&CKEditor=" . $_GET['CKEditor'] . "&CKEditorFuncNum=" . $_GET['CKEditorFuncNum'];
+        }
+        if (isset($_GET['id'])) {
+            $urlParams .= "&id=" . $_GET['id'];
+        }
+        if (isset($_GET['file'])) {
+            $urlParams .= "&file=" . $_GET['file'];
+        }
+        if (isset($_GET['multi'])) {
+            $urlParams .= "&multi=true";
+        }
+    @endphp
     <div class="container-fluid">
 
         {{-- Top Bar --}}
@@ -31,16 +46,9 @@
                 <div class="pull-left">
                     <ul class="breadcrumb">
                         @foreach ($breadcrumbs as $path => $disp)
-                            <?php $link = route('filemanager.picker') . "?folder=" . $path;
-                            if (isset($_GET['CKEditor']))
-                                $link .= "&CKEditor=my-editor&CKEditorFuncNum=0";
-                            if (isset($_GET['id']))
-                                $link .= "&id=" . $_GET['id'];
-                            if (isset($_GET['file']))
-                                $link .= "&file=" . $_GET['file'];
-                            if (isset($_GET['multi']))
-                                $link .= "&multi=true";
-                            ?>
+                            @php
+                                $link = route('filemanager.picker') . "?folder=" . $path . '&cloud=dropbox' . $urlParams;
+                            @endphp
                             <li><a href="{{$link}}">{{ $disp }}</a></li>
                         @endforeach
                         <li class="active">{{ $folderName }}</li>
@@ -61,13 +69,16 @@
                         data-toggle="modal" data-target="#modal-file-upload">
                     <i class="fa fa-upload"></i> {{trans('filemanager::filemanager.upload')}}
                 </button>
-                @php
-                    $params['provider']='dropbox';
-                @endphp
-                @if(is_dropbox_configured())
-                    <a href="{{ route('social.redirect', $params) }}" class="btn btn-dropbox">
+                @if(is_dropbox_configured() && !is_dropbox_loggedIn())
+                    <a href="{{ route('social.redirect', ['provider'=>'dropbox']) }}" class="btn btn-dropbox">
                         <i class="fa fa-dropbox"></i>
                         {{trans('filemanager::filemanager.connect_dropbox_btn')}}
+                    </a>
+                @endif
+                @if(is_onedrive_configured() && !is_onedrive_loggedIn())
+                    <a href="{{ route('social.redirect', ['provider'=>'graph']) }}" class="btn btn-onedrive">
+                        <i class="fa fa-windows"></i>
+                        {{trans('filemanager::filemanager.connect_onedrive_btn')}}
                     </a>
                 @endif
             </div>
@@ -126,22 +137,36 @@
                                     <td>&nbsp;</td>
                                 @endif
                                 <td>
-                                    <?php $link = route('filemanager.pickerSocial',["dropbox",""]) . "?folder=";
-                                    if (isset($_GET['CKEditor']))
-                                        $link .= "&CKEditor=my-editor&CKEditorFuncNum=0";
-                                    if (isset($_GET['id']))
-                                        $link .= "&id=" . $_GET['id'];
-                                    if (isset($_GET['file']))
-                                        $link .= "&file=" . $_GET['file'];
-                                    if (isset($_GET['multi']))
-                                        $link .= "&multi=true";
-                                    ?>
+                                    @php
+                                        $link = route('filemanager.pickerCloud',["dropbox",""]) . "?folder=" . $urlParams;
+                                    @endphp
                                     <a href="{{$link}}">
                                         <i class="fa fa-dropbox fa-lg fa-fw"></i>
                                         Dropbox
                                     </a>
                                 </td>
-                                <td>{{trans('filemanager::filemanager.social')}}</td>
+                                <td>{{trans('filemanager::filemanager.cloud')}}</td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>-</td>
+                            </tr>
+                        @endif
+
+                        @if(is_onedrive_loggedIn())
+                            <tr>
+                                @if(isset($_GET['multi']))
+                                    <td>&nbsp;</td>
+                                @endif
+                                <td>
+                                    @php
+                                        $link = route('filemanager.pickerCloud',["onedrive",""]) . "?folder=" . $urlParams;
+                                    @endphp
+                                    <a href="{{$link}}">
+                                        <i class="fa fa-windows fa-lg fa-fw"></i>
+                                        OneDrive
+                                    </a>
+                                </td>
+                                <td>{{trans('filemanager::filemanager.cloud')}}</td>
                                 <td>-</td>
                                 <td>-</td>
                                 <td>-</td>
@@ -154,16 +179,9 @@
                                     <td>&nbsp;</td>
                                 @endif
                                 <td>
-                                    <?php $link = route('filemanager.picker') . "?folder=" . $path;
-                                    if (isset($_GET['CKEditor']))
-                                        $link .= "&CKEditor=my-editor&CKEditorFuncNum=0";
-                                    if (isset($_GET['id']))
-                                        $link .= "&id=" . $_GET['id'];
-                                    if (isset($_GET['file']))
-                                        $link .= "&file=" . $_GET['file'];
-                                    if (isset($_GET['multi']))
-                                        $link .= "&multi=true";
-                                    ?>
+                                    @php
+                                        $link = route('filemanager.picker') . "?folder=" . $path . $urlParams;
+                                    @endphp
                                     <a href="{{$link}}">
                                         <i class="fa fa-folder fa-lg fa-fw"></i>
                                         {{ $name }}
@@ -238,10 +256,6 @@
 @stop
 
 @section(config('filemanager.javascript_section'))
-    @if(config('filemanager.jquery_datatables.use') && config('filemanager.jquery_datatables.cdn'))
-        <script src="https://cdn.datatables.net/1.10.11/js/jquery.dataTables.min.js"></script>
-        <script src="https://cdn.datatables.net/1.10.11/js/dataTables.bootstrap.min.js"></script>
-    @endif
     <script>
 
         // Confirm file delete
@@ -258,105 +272,6 @@
             $("#modal-folder-delete").modal("show");
         }
 
-        // Preview image
-        function preview_image(path) {
-            $("#preview-image").attr("src", path);
-            $("#modal-image-view").modal("show");
-        }
-
-        @if(config('filemanager.jquery_datatables.use'))
-        // init data tables plugin
-        $(function () {
-            $("#uploads-table").DataTable({
-                @if(config('app.locale') == 'nl')
-                // Load translations
-                "language": {
-                    "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Dutch.json"
-                },
-                @endif
-                @if(isset($_GET['multi']))
-                // Change default order column
-                "order": [[1, 'asc']]
-                @endif
-            });
-        });
-
-        @endif
-
-        function getUrlParam(paramName) {
-            var reParam = new RegExp('(?:[\?&]|&)' + paramName + '=([^&]+)', 'i');
-            var match = window.location.search.match(reParam);
-            return (match && match.length > 1) ? match[1] : null;
-        }
-
-        $(function () {
-            var data = {};
-            var files = [];
-            data.id = getUrlParam('id');
-            data.file = getUrlParam('file');
-            data.folder = (getUrlParam('folder') != null) ? getUrlParam('folder') + (getUrlParam('folder') === '/' ? '' : '/') : '/';
-
-            if (getUrlParam('multi')) {
-                var btnMulti = $('#multi-add');
-
-                $('#check-all').click(function (e) {
-                    var state = this.checked;
-                    // Iterate each checkbox
-                    $('input[name="files[]').each(function () {
-                        this.checked = state;
-                    });
-                    btnMulti.attr('disabled', !state)
-                });
-
-                // multi add
-                $('input[name="files[]"').change(function (e) {
-                    if ($('[name="files[]"]:checked').length > 0) {
-                        btnMulti.removeAttr('disabled');
-                    } else {
-                        btnMulti.attr('disabled', 'disabled');
-                    }
-                });
-
-                btnMulti.click(function (e) {
-                    e.preventDefault();
-                    data.type = 'multi';
-
-                    $('[name="files[]"]:checked').each(function () {
-                        files.push($(this).data());
-                    });
-                    data.files = files;
-                    sentLocalStorage(data);
-                    window.close();
-                })
-            }
-
-            $('a.file').click(function (e) {
-                if (getUrlParam('CKEditor')) {
-                    var webpath = '{{config('filesystems.disks.' . config('filesystems.' .  config('filemanager.uploads.storage')) . '.url')}}';
-                    // use CKEditor 3.0 + integration method
-                    if (window.opener) {
-                        // Popup
-                        window.opener.CKEDITOR.tools.callFunction(getUrlParam('CKEditorFuncNum'), webpath + data.folder + $(this).data('fileName'));
-                    } else {
-                        // Modal (in iframe)
-                        parent.CKEDITOR.tools.callFunction(getUrlParam('CKEditorFuncNum'), webpath + data.folder + $(this).data('fileName'));
-                        parent.CKEDITOR.tools.callFunction(getUrlParam('CKEditorCleanUpFuncNum'));
-                    }
-                } else {
-                    // single add
-                    e.preventDefault();
-                    data.type = 'single';
-                    data.files = [$(this).data()];
-                    sentLocalStorage(data);
-                }
-                window.close();
-            });
-
-            function sentLocalStorage(data) {
-                //https://stackoverflow.com/a/28230846
-                localStorage.setItem('fm_data', JSON.stringify(data));
-                localStorage.removeItem('fm_data');
-            }
-        })
     </script>
+    @include('iemand002/filemanager::_pickerJs')
 @stop

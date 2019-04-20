@@ -50,3 +50,20 @@ function is_dropbox_loggedIn(){
     }
     return false;
 }
+
+function is_onedrive_configured(){
+    if(config('services.graph.client_id') && config('services.graph.client_secret') && config('services.graph.redirect')){
+        return true;
+    }
+    return false;
+}
+
+function is_onedrive_loggedIn(){
+    if(is_onedrive_configured() && auth()->check()){
+        $social = Social::where('user_id', auth()->id())->where('provider', 'graph')->first();
+        if($social) {
+            return true;
+        }
+    }
+    return false;
+}

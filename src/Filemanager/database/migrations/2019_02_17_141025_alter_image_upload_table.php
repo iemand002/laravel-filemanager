@@ -11,7 +11,8 @@ class AlterImageUploadTable extends Migration
 
     public function __construct()
     {
-        $this->table = Config::get('filemanager.table','uploads');
+        $this->table = config('filemanager.table','uploads');
+        $this->usersTable = config('filemanager.users_table','users');
     }
 
     /**
@@ -24,7 +25,13 @@ class AlterImageUploadTable extends Migration
             Schema::table($this->table, function (Blueprint $table) {
                 $table->string('key')->after('mimeType')->nullable();
                 $table->string('provider')->after('key')->nullable();
-                $table->dateTime('time_taken')->after('provider')->nullable();
+                $table->integer('added_by_id')->after('provider')->unsigned()->nullable();
+                $table->dateTime('time_taken')->after('added_by_id')->nullable();
+            });
+            Schema::table($this->table, function(Blueprint $table) {
+                $table->foreign('added_by_id')->references('id')->on($this->usersTable)
+                    ->onDelete('restrict')
+                    ->onUpdate('restrict');
             });
         }
     }
@@ -36,9 +43,13 @@ class AlterImageUploadTable extends Migration
     public function down()
     {
         if (Schema::hasTable($this->table)) {
+            Schema::table($this->table, function(Blueprint $table) {
+                $table->dropForeign($this->table . '_added_by_id_foreign');
+            });
             Schema::table($this->table, function (Blueprint $table) {
                $table->dropColumn('key');
                $table->dropColumn('provider');
+               $table->dropColumn('added_by_id');
                $table->dropColumn('time_taken');
             });
         }

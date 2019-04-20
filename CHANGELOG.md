@@ -1,4 +1,8 @@
 # Changelog
+##2.1.0  
+Added: 
+* Dropbox and OneDrive integrations
+
 ## 2.0.0  
 Added: 
 * Multiple files select option

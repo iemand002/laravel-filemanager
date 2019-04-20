@@ -27,6 +27,10 @@ class SocialController extends Controller
             session()->flash('redirect', $_GET['redirect']);
         }
 
+        if ($provider == 'graph') {
+            return Socialite::driver($provider)->scopes(['openid', 'Files.ReadWrite', 'Files.ReadWrite.All', 'Sites.ReadWrite.All', 'offline_access'])->redirect();
+        }
+
         return Socialite::driver($provider)->redirect();
     }
 
@@ -70,7 +74,18 @@ class SocialController extends Controller
                 $socialData->social_id = $user->id;
                 $socialData->provider = $provider;
                 $socialData->token=$user->token;
+                if ($provider=='graph') {
+                    $socialData->refresh = $user->refreshToken;
+                    $socialData->expires = $user->expiresIn;
+                }
                 $socialUser->socials()->save($socialData);
+            } else {
+                if ($provider=='graph') {
+                    $sameSocialId->token=$user->token;
+                    $sameSocialId->refresh = $user->refreshToken;
+                    $sameSocialId->expires = $user->expiresIn;
+                    $sameSocialId->save();
+                }
             }
 
         } else {
@@ -88,6 +103,10 @@ class SocialController extends Controller
                 $socialData->social_id = $user->id;
                 $socialData->provider = $provider;
                 $socialData->token=$user->token;
+                if ($provider=='graph') {
+                    $socialData->refresh = $user->refreshToken;
+                    $socialData->expires = $user->expiresIn;
+                }
                 $newSocialUser->socials()->save($socialData);
 
                 $socialUser = $newSocialUser;
@@ -95,6 +114,12 @@ class SocialController extends Controller
             } else {
 
                 //Load this existing social user
+                if ($provider=='graph') {
+                    $sameSocialId->token=$user->token;
+                    $sameSocialId->refresh = $user->refreshToken;
+                    $sameSocialId->expires = $user->expiresIn;
+                    $sameSocialId->save();
+                }
                 $socialUser = $sameSocialId->user;
 
             }

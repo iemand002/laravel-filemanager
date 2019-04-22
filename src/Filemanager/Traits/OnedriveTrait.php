@@ -62,7 +62,7 @@ trait OnedriveTrait
                 dd($e);
             }
         }
-        return redirect()->route('social.redirect', ['provider' => 'graph', 'redirect' => route('picture.import', ['provider' => 'onedrive', $album->slug])]);
+        return redirect()->route('social.redirect', ['provider' => 'graph', 'redirect' => route('picture.import', ['provider' => 'onedrive'])]);
     }
 
     /**

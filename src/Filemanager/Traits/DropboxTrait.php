@@ -51,7 +51,7 @@ trait DropboxTrait
                 dd($e);
             }
         }
-        return redirect()->route('social.redirect', ['provider' => 'dropbox', 'redirect' => route('filemanager.pickerSocial', ['provider' => 'dropbox'])]);
+        return redirect()->route('social.redirect', ['provider' => 'dropbox', 'redirect' => route('filemanager.pickerCloud', ['provider' => 'dropbox'])]);
     }
 
     /**

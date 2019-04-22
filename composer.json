@@ -11,13 +11,16 @@
         }
     ],
     "require": {
+        "php" : "^7.0",
         "illuminate/config": "~5.5.0|~5.6.0",
         "illuminate/database": "~5.5.0|~5.6.0",
         "illuminate/support": "~5.5.0|~5.6.0",
         "intervention/image": "^2.4",
-        "dflydev/apache-mime-types": "^1.0",
-        "socialiteproviders/dropbox": "^4.0",
-        "socialiteproviders/microsoft-graph": "^2.0"
+        "dflydev/apache-mime-types": "^1.0"
+    },
+    "suggest": {
+        "socialiteproviders/dropbox": "For Dropbox login and unlocking the integration in de file picker",
+        "socialiteproviders/microsoft-graph": "For Microsoft login and unlocking the OneDrive integration in the file picker"
     },
     "autoload": {
         "psr-4": {

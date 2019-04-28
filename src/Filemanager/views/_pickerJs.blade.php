@@ -108,10 +108,13 @@
                     type: "POST",
                     url: "{{route('filemanager.save-cloud')}}",
                     data: data
-                }).done(function() {
+                }).done(function(savedData) {
                     if (getUrlParam('CKEditor')) {
                         callCkeditor(data);
                     } else {
+                        for (var i = 0;i < savedData.length; i++){
+                            data.files[i].fileId = savedData[i].id;
+                        }
                         sentLocalStorage(data);
                     }
                 });

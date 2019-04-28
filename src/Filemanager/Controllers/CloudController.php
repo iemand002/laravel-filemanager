@@ -62,8 +62,8 @@ class CloudController extends Controller
     function showPicture($provider, $folderFile, $size = null)
     {
         $file = substr($folderFile, strrpos($folderFile, '/') + 1);
-        $folder = str_replace(' ','%20',substr($folderFile,0,strrpos($folderFile, '/') + 1));
-        $pic = Uploads::where('folder',$folder)->where('filename',$file)->first();
+        $folder = str_replace(' ', '%20', substr($folderFile, 0, strrpos($folderFile, '/') + 1));
+        $pic = Uploads::where('folder', $folder)->where('filename', $file)->first();
         switch ($provider) {
             case 'dropbox':
                 $social = Social::where('user_id', $pic->added_by_id)->where('provider', 'dropbox')->first();
@@ -82,13 +82,14 @@ class CloudController extends Controller
      * Store the selected files
      *
      * @param Request $request
-     * @return false|string
+     * @return array
      */
     public function store(Request $request)
     {
         $uploads = [];
         foreach ($request->input('files') as $file) {
-            if (!Uploads::where('key',$file["fileId"])->first()) {
+            $upload = Uploads::where('key', $file["fileId"])->first();
+            if (!$upload) {
                 // save upload info
                 $upload = new Uploads();
                 $upload->filename = $file["fileName"];
@@ -98,11 +99,11 @@ class CloudController extends Controller
                 $upload->provider = $request->input('cloud');
                 $upload->added_by_id = auth()->id();
                 $upload->save();
-                $uploads[] = $upload;
             }
+            $uploads[] = $upload;
         }
 
-        return json_encode($uploads);
+        return ($uploads);
     }
 
 }

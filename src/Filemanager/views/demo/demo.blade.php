@@ -128,7 +128,7 @@
                 '<img alt="dummy placeholder" src="/img/dummy.png" class="img img-responsive" id="image-preview' + count + '">' +
                 '<div class="input-group">' +
                 '<input id="picture' + count + '" name="picture' + count + '" type="hidden">' +
-                '<input id="upload_id' + count + '" name="upload_id' + count + '" data-count=' + count + '" type="hidden">' +
+                '<input id="upload_id' + count + '" name="upload_id' + count + '" data-count="' + count + '" type="hidden">' +
                 '<button id="picker' + count + '" type="button" class="btn btn-success"' +
                 'onclick="window.open(\'{{route('filemanager.picker')}}?id=upload_id' + count + '&file=picture' + count + '&count=' + count + '&add=true&multi=true\',\'imagepicker\', \'width=1000,height=500,scrollbars=yes,toolbar=no,location=no\'); return false">' +
                 '<i class="fa fa-plus-circle"></i> {{trans('filemanager::filemanager.choose_picture')}}' +

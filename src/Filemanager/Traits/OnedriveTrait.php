@@ -175,7 +175,7 @@ trait OnedriveTrait
             } catch (BadResponseException $e) {
 
                 if ($e->getCode() == 401) {
-                    if ($this->refreshToken($social, route('picture.getPicture', ['onedrive', $pic->url]))) {
+                    if ($this->refreshToken($social, route('filemanager.showPicture', ['onedrive', $pic->folder . $pic->filename]))) {
                         return $this->getOnedrivePic($pic, $size, $social);
                     }
                 }

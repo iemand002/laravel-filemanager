@@ -25,6 +25,7 @@ class AlterImageUploadTable extends Migration
             Schema::table($this->table, function (Blueprint $table) {
                 $table->string('key')->after('mimeType')->nullable();
                 $table->string('provider')->after('key')->nullable();
+                $table->string('dimension')->after('provider')->nullable();
                 $table->integer('added_by_id')->after('provider')->unsigned()->nullable();
                 $table->dateTime('time_taken')->after('added_by_id')->nullable();
             });

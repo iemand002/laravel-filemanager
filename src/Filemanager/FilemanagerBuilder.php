@@ -39,6 +39,10 @@ class FilemanagerBuilder
         $folder = str_finish($upload->folder, '/');
         $path = $folder . $upload->filename;
 
+        if ($upload->provider) {
+            return getenv('APP_URL') . $upload->provider . '/' . $path;
+        }
+
         if (is_image($upload->mimeType) && $transformHandle != null) {
             $transforms = config('filemanager.transforms');
             $transform = $transforms[$transformHandle];
@@ -68,9 +72,8 @@ class FilemanagerBuilder
      * @param $folder
      * @param $upload
      * @param $transform
-     * @return string
      */
-    private function makeTransform($transformHandle, $folder, $upload, $transform): string
+    private function makeTransform($transformHandle, $folder, $upload, $transform)
     {
         $transformFolder = str_finish($folder . '_' . $transformHandle, '/');
         $path = $transformFolder . $upload->filename;
@@ -95,6 +98,10 @@ class FilemanagerBuilder
             return null;
         }
 
+        if ($upload->provider) {
+            return $upload;
+        }
+
         $folder = str_finish($upload->folder, '/');
         $path = $folder . $upload->filename;
 
@@ -110,5 +117,31 @@ class FilemanagerBuilder
         }
 
         return $this->intervention->make($this->disk->get($path));
+    }
+
+    /**
+     * Calculates restricted dimensions with a maximum of $goal_width by $goal_height
+     *
+     * @param $goal_width
+     * @param $goal_height
+     * @param $width
+     * @param $height
+     * @return array
+     */
+    private function resize_dimensions($goal_width, $goal_height, $width, $height)
+    {
+        $return = array('width' => $width, 'height' => $height);
+
+        // If the ratio > goal ratio and the width > goal width resize down to goal width
+        if ($width / $height > $goal_width / $goal_height && $width > $goal_width) {
+            $return['width'] = $goal_width;
+            $return['height'] = (int)($goal_width / $width * $height);
+        } // Otherwise, if the height > goal, resize down to goal height
+        else if ($height > $goal_height) {
+            $return['width'] = (int)($goal_height / $height * $width);
+            $return['height'] = $goal_height;
+        }
+
+        return $return;
     }
 }

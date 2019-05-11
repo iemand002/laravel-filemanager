@@ -90,11 +90,14 @@ class CloudController extends Controller
         foreach ($request->input('files') as $file) {
             $upload = Uploads::where('key', $file["fileId"])->first();
             if (!$upload) {
+                $dimension = explode('x', $file['fileDimension']);
                 // save upload info
                 $upload = new Uploads();
                 $upload->filename = $file["fileName"];
                 $upload->folder = $request->input('folder');
+                $upload->mimeType = $file['fileMimeType'];
                 $upload->key = $file["fileId"];
+                $upload->dimension = $file['fileDimension'] ? ['width' => (int)$dimension[0], 'height' => (int)$dimension[1]] : null;
                 $upload->time_taken = new Carbon($file["fileDate"]);
                 $upload->provider = $request->input('cloud');
                 $upload->added_by_id = auth()->id();

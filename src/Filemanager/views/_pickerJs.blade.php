@@ -69,6 +69,8 @@
             btnMulti.click(function (e) {
                 e.preventDefault();
                 data.type = 'multi';
+                btnMulti.attr('disabled', 'disabled');
+
 
                 $('[name="files[]"]:checked').each(function () {
                     files.push($(this).data());

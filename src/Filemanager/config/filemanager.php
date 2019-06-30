@@ -2,7 +2,7 @@
 return [
     // Where to leave the uploads?
     'uploads' => [
-        'storage' => env('FILEMANAGER_STORAGE','default'), // filesystem 'default' or 'cloud'
+        'storage' => env('FILEMANAGER_STORAGE', 'default'), // filesystem 'default' or 'cloud'
         'temp' => 'temp', // temporary upload folder for image transforms
     ],
 
@@ -51,12 +51,12 @@ return [
     ],
 
     /*
-   * Sizes, used to crop and create multiple size.
-   *
-   * array(width, height, squared, quality)
-   *  if square set to TRUE, image will be in square
-   * if quality set to NULL, the default setting from above will be used
-   */
+     * Sizes, used to crop and create multiple size.
+     *
+     * array(width, height, squared, quality)
+     * if square set to TRUE, image will be in square
+     * if quality set to NULL, the default setting from above will be used
+     */
     'transforms' => [
         'square50' => [50, 50, true, 100],
         'square100' => [100, 100, true, null],
@@ -68,4 +68,23 @@ return [
         'size200' => [200, 200, false, null],
         'size400' => [400, 400, false, null],
     ],
+
+    /*
+     * Default transform for cloud images.
+     *
+     * array(width, height, squared, quality)
+     * Due to the Dropbox API this are the options:
+     *
+     * [32, 32, true, null]
+     * [64, 64, true, null]
+     * [128, 128, true, null]
+     * [256, 256, true, null]
+     * [480, 320, false, null]
+     * [640, 480, false, null]
+     * [960, 640, false, null]
+     * [1024, 768, false, null]
+     * [2048, 1536, false, null]
+     *
+     */
+    'cloud_default_transform' => [640, 480, false, null],
 ];

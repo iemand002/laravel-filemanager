@@ -55,7 +55,7 @@ class UploadsManager
         $folderName = current($slice);
         $breadcrumbs = array_slice($breadcrumbs, 0, -1);
 
-        $uploads = Uploads::where('folder', str_finish($folder, '/'))->get();
+        $uploads = Uploads::where('folder', str_finish($folder, '/'))->where('provider', null)->get();
 
         $subfolders = [];
         foreach (array_unique($this->disk->directories($folder)) as $subfolder) {

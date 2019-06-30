@@ -138,7 +138,7 @@
                                 @endif
                                 <td>
                                     @php
-                                        $link = route('filemanager.pickerCloud',["dropbox",""]) . "?folder=" . $urlParams;
+                                        $link = route('filemanager.pickerCloud',["dropbox",""]) . "?folder=" . $urlParams . '&cloud=dropbox';
                                     @endphp
                                     <a href="{{$link}}">
                                         <i class="fa fa-dropbox fa-lg fa-fw"></i>
@@ -159,7 +159,7 @@
                                 @endif
                                 <td>
                                     @php
-                                        $link = route('filemanager.pickerCloud',["onedrive",""]) . "?folder=" . $urlParams;
+                                        $link = route('filemanager.pickerCloud',["onedrive",""]) . "?folder=" . $urlParams . '&cloud=onedrive';
                                     @endphp
                                     <a href="{{$link}}">
                                         <i class="fa fa-windows fa-lg fa-fw"></i>

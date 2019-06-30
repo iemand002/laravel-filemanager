@@ -85,7 +85,8 @@ trait DropboxTrait
                 break;
             case 'thumb':
             default:
-                $size = "w640h480";
+                $dimension = $this->calculateDropboxTransform($upload, $size);
+                $size = 'w' . $dimension['width'] . 'h' . $dimension['height'];
                 break;
         }
         if ($social) {

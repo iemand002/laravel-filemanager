@@ -5,6 +5,7 @@ namespace Iemand002\Filemanager\Controllers;
 use App\Http\Controllers\Controller;
 use Iemand002\Filemanager\models\Social;
 use Iemand002\Filemanager\models\Uploads;
+use Iemand002\Filemanager\Traits\DropboxHelperTrait;
 use Iemand002\Filemanager\Traits\DropboxTrait;
 use Iemand002\Filemanager\Traits\OnedriveTrait;
 use Carbon\Carbon;
@@ -12,7 +13,7 @@ use Illuminate\Http\Request;
 
 class CloudController extends Controller
 {
-    use DropboxTrait, OnedriveTrait;
+    use DropboxTrait, DropboxHelperTrait, OnedriveTrait;
 
     /**
      * @param $provider
@@ -59,10 +60,18 @@ class CloudController extends Controller
      * @return int|mixed
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    function showPicture($provider, $folderFile, $size = null)
+    function showPicture($provider, $folderFile)
     {
-        $file = substr($folderFile, strrpos($folderFile, '/') + 1);
-        $folder = str_replace(' ', '%20', substr($folderFile, 0, strrpos($folderFile, '/') + 1));
+        if (substr($folderFile, 0, 1) == '_') {
+            $size = substr(strstr($folderFile, '/', true), 1);
+            $file = substr($folderFile, strrpos($folderFile, '/') + 1);
+            $folder = str_replace(' ', '%20', substr(strstr($folderFile, '/'), 1, strrpos(strstr($folderFile, '/'), '/')));
+
+        } else {
+            $size = null;
+            $file = substr($folderFile, strrpos($folderFile, '/') + 1);
+            $folder = str_replace(' ', '%20', substr($folderFile, 0, strrpos($folderFile, '/') + 1));
+        }
         $pic = Uploads::where('folder', $folder)->where('filename', $file)->first();
         switch ($provider) {
             case 'dropbox':

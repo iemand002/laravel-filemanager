@@ -105,7 +105,7 @@
                                                 <input type="checkbox" name="files[]" id="check{{$loop->index}}"
                                                        data-file-id="{{$entry->id}}" data-file-name="{{ $entry->name }}"
                                                        data-file-date="{{ \Carbon\Carbon::createFromTimeString($entry->client_modified)->format('Y-m-d H:i:s') }}"
-                                                       data-file-dimension="@if (is_image($mimeType)){{$entry->media_info->metadata->dimensions->width}}x{{$entry->media_info->metadata->dimensions->height}}@endif"
+                                                       data-file-dimension="@if (isset($entry->media_info->metadata->dimensions)){{$entry->media_info->metadata->dimensions->width}}x{{$entry->media_info->metadata->dimensions->height}}@endif"
                                                        data-file-mime-type="{{$mimeType}}"
                                                 >
                                                 <span class="sr-only">{{trans('filemanager::filemanager.check')}}</span>
@@ -116,7 +116,7 @@
                                         <a class="file" href="#" data-file-id="{{$entry->id}}"
                                            data-file-name="{{ $entry->name }}"
                                            data-file-date="{{ \Carbon\Carbon::createFromTimeString($entry->client_modified)->format('Y-m-d H:i:s') }}"
-                                           data-file-dimension="@if (is_image($mimeType)){{$entry->media_info->metadata->dimensions->width}}x{{$entry->media_info->metadata->dimensions->height}}@endif"
+                                           data-file-dimension="@if (isset($entry->media_info->metadata->dimensions)){{$entry->media_info->metadata->dimensions->width}}x{{$entry->media_info->metadata->dimensions->height}}@endif"
                                            data-file-mime-type="{{$mimeType}}"
                                         >
                                             @if (is_image($mimeType))

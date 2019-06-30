@@ -8,7 +8,7 @@ class Uploads extends Model
 {
     protected $table;
     public $timestamps = true;
-    protected $casts = ['dimension'=>'array'];
+    protected $casts = ['dimension'=>'object'];
 
     /**
      * Uploads constructor.
@@ -21,10 +21,10 @@ class Uploads extends Model
     }
 
     public function scopeWidth(){
-        return $this->dimension->width;
+        return $this->dimension->width ?? 0;
     }
 
     public function scopeHeight(){
-        return $this->dimension->height;
+        return $this->dimension->height ?? 0;
     }
 }

@@ -18,5 +18,5 @@ Route::group(['middleware' => array_merge(['web'], config('filemanager.middlewar
 Route::group(['middleware' => ['web']], function () {
     Route::get('/social/redirect/{provider}', ['as' => 'social.redirect', 'uses' => '\Iemand002\Filemanager\Controllers\SocialController@getSocialRedirect']);
     Route::get('/social/handle/{provider}', ['as' => 'social.handle', 'uses' => '\Iemand002\Filemanager\Controllers\SocialController@getSocialHandle']);
-    Route::get('{provider}/{file}', '\Iemand002\Filemanager\Controllers\CloudController@showPicture')->where(['provider'=>'dropbox|onedrive', 'file'=>'[^\\/:<>|"?*]+(\/)[^\\:<>|"?*]+\.[a-zA-Z0-9]+'])->name('filemanager.showPicture');
+    Route::get('{provider}/{file}', '\Iemand002\Filemanager\Controllers\CloudController@showPicture')->where(['provider'=>'dropbox|onedrive', 'file'=>'[^\\:<>|"?*]+(\/)?[^\\:<>|"?*]+\.[a-zA-Z0-9]+'])->name('filemanager.showPicture');
 });

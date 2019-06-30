@@ -139,9 +139,12 @@ trait OnedriveTrait
                 $size = "large";
                 break;
             case 'thumb':
-            default:
                 $type = 'custom';
                 $size = "640x480";
+                break;
+            default:
+                $type = 'custom';
+                $size = $this->calculateSize($size);
                 break;
         }
         if ($social) {
@@ -166,7 +169,7 @@ trait OnedriveTrait
                 $response = $client->send($request);
                 $data = \GuzzleHttp\json_decode($response->getBody()->getContents());
                 if ($type == 'custom') {
-                    $img = Image::make($data->value[0]->c640x480->url);
+                    $img = Image::make(((array)$data->value[0])['c' . $size]->url);
                 } else {
                     $img = Image::make($data->url);
                 }
@@ -186,5 +189,24 @@ trait OnedriveTrait
                 return ($e->getCode());
             }
         }
+    }
+
+    private function calculateSize($transformHandle)
+    {
+        $default = config('filemanager.cloud_default_transform');
+        list($width, $height, $squared, $quality) = $default;
+
+        if ($transformHandle == null) {
+            return $width . 'x' . $height;
+        }
+        $transforms = config('filemanager.transforms');
+        $transform = $transforms[$transformHandle];
+
+        if (empty($transform) || !is_array($transform)) {
+            return $width . 'x' . $height;
+        }
+        list($width, $height, $squared, $quality) = $transform;
+
+        return $width . 'x' . $height;
     }
 }

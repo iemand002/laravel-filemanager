@@ -4,11 +4,14 @@ namespace Iemand002\Filemanager;
 
 use Dflydev\ApacheMimeTypes\PhpRepository;
 use Iemand002\Filemanager\models\Uploads;
+use Iemand002\Filemanager\Traits\DropboxHelperTrait;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\ImageManager;
 
 class FilemanagerBuilder
 {
+    use DropboxHelperTrait;
+
     protected $manager, $disk, $intervention;
 
     /**
@@ -40,7 +43,11 @@ class FilemanagerBuilder
         $path = $folder . $upload->filename;
 
         if ($upload->provider) {
-            return getenv('APP_URL') . $upload->provider . '/' . $path;
+            if ($transformHandle) {
+                return getenv('APP_URL') . $upload->provider . '/_' . $transformHandle . '/' . $path;
+            } else {
+                return getenv('APP_URL') . $upload->provider . '/' . $path;
+            }
         }
 
         if (is_image($upload->mimeType) && $transformHandle != null) {
@@ -59,12 +66,12 @@ class FilemanagerBuilder
 
     public function getWidth($id, $transformHandle = null)
     {
-        return $this->getImage($id,$transformHandle)->width();
+        return $this->getImage($id, $transformHandle) ? $this->getImage($id, $transformHandle)->width() : 0;
     }
 
     public function getHeight($id, $transformHandle = null)
     {
-        return $this->getImage($id,$transformHandle)->height();
+        return $this->getImage($id, $transformHandle) ? $this->getImage($id, $transformHandle)->height() : 0;
     }
 
     /**
@@ -91,28 +98,44 @@ class FilemanagerBuilder
         return $path;
     }
 
-    private function getImage($id, $transformHandle = null){
+    /**
+     * @param $id
+     * @param null $transformHandle
+     * @return \Intervention\Image\Image|null
+     */
+    private function getImage($id, $transformHandle = null)
+    {
         $upload = Uploads::find($id);
 
         if ($upload == null || !is_image($upload->mimeType)) {
             return null;
         }
 
-        if ($upload->provider) {
-            return $upload;
-        }
-
-        $folder = str_finish($upload->folder, '/');
-        $path = $folder . $upload->filename;
-
-        if ($transformHandle != null){
+        if ($transformHandle != null) {
             $transforms = config('filemanager.transforms');
             $transform = $transforms[$transformHandle];
 
             if (empty($transform) || !is_array($transform)) {
                 return null;
             }
+        }
 
+        if ($upload->provider) {
+            if ($upload->provider == 'dropbox') {
+                $transform = $this->calculateDropboxTransform($upload, $transformHandle ?? null);
+                $dimension = $this->resize_dimensions($transform['width'], $transform['height'], $upload->dimension->width, $upload->dimension->height);
+            } else {
+                list($width, $height) = config('filemanager.cloud_default_transform');
+                $dimension = $this->resize_dimensions($transform[0] ?? $width, $transform[1] ?? $height, $upload->dimension->width, $upload->dimension->height);
+            }
+            $upload->dimension = $dimension;
+            return $upload;
+        }
+
+        $folder = str_finish($upload->folder, '/');
+        $path = $folder . $upload->filename;
+
+        if ($transformHandle != null) {
             $path = $this->makeTransform($transformHandle, $folder, $upload, $transform);
         }
 

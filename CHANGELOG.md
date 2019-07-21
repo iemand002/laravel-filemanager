@@ -3,6 +3,9 @@
 Added: 
 * Dropbox and OneDrive integrations
 
+Changed:  
+* Required L5.6+/PHP7.1+
+
 ## 2.0.0  
 Added: 
 * Multiple files select option

@@ -6,7 +6,10 @@
 
 ## Installation
 ### Requirements
-* Laravel 5.2 (version 0.x), Laravel 5.5+ (version 1.x/2.x)
+* Laravel  
+    * 5.2 (version 0.x), 
+    * 5.5 (version 1.x/2.0), 
+    * 5.6/5.7/5.8 (version 2.1)
 * Twitter Bootstrap 3
 * Jquery
 
@@ -91,12 +94,15 @@ Route::get('demo',function () {
 
 ## TODO
 * Find out what's wrong with the graph login, it works, but giving errors sometimes
-* Clouds vs. transforms
 * Cloud remove reference in database if file is removed from the cloud
+* Update views to bootstrap 4
 
 ## Changelog
 2.1.0  
 Added: 
-* Dropbox and OneDrive integrations
+* Dropbox and OneDrive integrations  
+
+Changed:  
+* Required L5.6+/PHP7.1+
 
 Check previous changes in CHANGELOG.md

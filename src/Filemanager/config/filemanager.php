@@ -7,6 +7,7 @@ return [
     ],
 
     // Table
+    'use_bigInteger' => true,
     'table' => 'uploads', // Table to store the uploads
     'social_table' => 'social_logins', // Table to store the social logins
     'users_table' => 'users', // Table where the users are stored, usually this is the default 'users'

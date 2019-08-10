@@ -11,7 +11,7 @@ class CreateImageUploadTable extends Migration
 
     public function __construct()
     {
-        $this->table = Config::get('filemanager.table','uploads');
+        $this->table = Config::get('filemanager.table', 'uploads');
     }
 
     /**
@@ -20,9 +20,13 @@ class CreateImageUploadTable extends Migration
      */
     public function up()
     {
-        if (! Schema::hasTable($this->table)) {
+        if (!Schema::hasTable($this->table)) {
             Schema::create($this->table, function (Blueprint $table) {
-                $table->increments('id');
+                if (Config::get('filemanager.use_bigInteger', true)) {
+                    $table->bigIncrements('id');
+                } else {
+                    $table->increments('id');
+                }
                 $table->string('filename')->nullable();
                 $table->string('folder')->nullable();
                 $table->string('mimeType')->nullable();

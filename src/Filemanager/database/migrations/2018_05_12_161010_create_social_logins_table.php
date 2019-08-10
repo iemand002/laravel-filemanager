@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Schema;
 
 class CreateSocialLoginsTable extends Migration {
@@ -18,8 +19,16 @@ class CreateSocialLoginsTable extends Migration {
 	{
 	    if (! Schema::hasTable($this->table)) {
             Schema::create($this->table, function(Blueprint $table) {
-                $table->increments('id');
-                $table->integer('user_id')->unsigned();
+                if (Config::get('filemanager.use_bigInteger', true)) {
+                    $table->bigIncrements('id');
+                } else {
+                    $table->increments('id');
+                }
+                if (Config::get('filemanager.use_bigInteger', true)) {
+                    $table->bigInteger('user_id')->unsigned();
+                } else {
+                    $table->integer('user_id')->unsigned();
+                }
                 $table->string('provider');
                 $table->string('social_id');
                 $table->text('token');

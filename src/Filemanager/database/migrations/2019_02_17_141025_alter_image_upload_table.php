@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Schema;
 class AlterImageUploadTable extends Migration
 {
     protected $table;
+    protected $usersTable;
 
     public function __construct()
     {
@@ -26,7 +27,11 @@ class AlterImageUploadTable extends Migration
                 $table->string('key')->after('mimeType')->nullable();
                 $table->string('provider')->after('key')->nullable();
                 $table->string('dimension')->after('provider')->nullable();
-                $table->integer('added_by_id')->after('provider')->unsigned()->nullable();
+                if (Config::get('filemanager.use_bigInteger', true)) {
+                    $table->bigInteger('added_by_id')->after('provider')->unsigned()->nullable();
+                } else {
+                    $table->integer('added_by_id')->after('provider')->unsigned()->nullable();
+                }
                 $table->dateTime('time_taken')->after('added_by_id')->nullable();
             });
             Schema::table($this->table, function(Blueprint $table) {

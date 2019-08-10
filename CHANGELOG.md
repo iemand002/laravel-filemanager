@@ -1,10 +1,17 @@
 # Changelog
+##2.1.1
+Added:  
+* Config setting to choose `bigIncrements` and `bigInteger` usage  
+
+Changed
+* Use `bigIncrements` and `bigInteger` by default in migrations
+
 ##2.1.0  
 Added: 
 * Dropbox and OneDrive integrations
 
 Changed:  
-* Required L5.6+/PHP7.1+
+* Requires L5.6+/PHP7.1+
 
 ## 2.0.0  
 Added: 

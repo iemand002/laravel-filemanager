@@ -7,6 +7,7 @@ use Dflydev\ApacheMimeTypes\PhpRepository;
 use Exception;
 use Iemand002\Filemanager\models\Uploads;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Intervention\Image\ImageManager;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -55,11 +56,11 @@ class UploadsManager
         $folderName = current($slice);
         $breadcrumbs = array_slice($breadcrumbs, 0, -1);
 
-        $uploads = Uploads::where('folder', str_finish($folder, '/'))->where('provider', null)->get();
+        $uploads = Uploads::where('folder', Str::finish($folder, '/'))->where('provider', null)->get();
 
         $subfolders = [];
         foreach (array_unique($this->disk->directories($folder)) as $subfolder) {
-            if (!starts_with(basename($subfolder), '_')) {
+            if (!Str::startsWith(basename($subfolder), '_')) {
                 $subfolders["/$subfolder"] = basename($subfolder);
             }
         }
@@ -94,7 +95,7 @@ class UploadsManager
 
         $subfolders = [];
         foreach (array_unique($this->disk->directories($folder)) as $subfolder) {
-            if (!starts_with(basename($subfolder), '_')) {
+            if (!Str::startsWith(basename($subfolder), '_')) {
                 $subfolders["/$subfolder"] = basename($subfolder);
             }
         }
@@ -326,7 +327,7 @@ class UploadsManager
                 });
             }
 
-            $tempFile = str_finish($this->tempFolder, '/') . $filename;
+            $tempFile = Str::finish($this->tempFolder, '/') . $filename;
 
             mkdir($this->tempFolder);
             $image->save($tempFile, $quality);
@@ -343,16 +344,41 @@ class UploadsManager
      */
     private function removeTemp()
     {
-        $it = new RecursiveDirectoryIterator($this->tempFolder, RecursiveDirectoryIterator::SKIP_DOTS);
-        $files = new RecursiveIteratorIterator($it,
-            RecursiveIteratorIterator::CHILD_FIRST);
-        foreach ($files as $file) {
-            if ($file->isDir()) {
-                rmdir($file->getRealPath());
-            } else {
-                unlink($file->getRealPath());
+//        $it = new RecursiveDirectoryIterator($this->tempFolder, RecursiveDirectoryIterator::SKIP_DOTS);
+//        $files = new RecursiveIteratorIterator($it,
+//            RecursiveIteratorIterator::CHILD_FIRST);
+//        foreach ($files as $file) {
+//            if ($file->isDir()) {
+//                rmdir($file->getRealPath());
+//            } else {
+//                unlink($file->getRealPath());
+//            }
+//        }
+//        rmdir($this->tempFolder);
+
+        $path = $this->tempFolder;
+        if (file_exists($path) === false) {
+            return;
+        }
+        if (is_file($path)) {
+            unlink($path);
+            return;
+        }
+
+        $files = scandir($path);
+
+        foreach ($files as $item) {
+            if ($item === '.' || $item === '..') {
+                continue;
+            }
+
+            $fullPath = $path . '/' . $item;
+
+            if (is_file($fullPath)) {
+                unlink($fullPath);
             }
         }
-        rmdir($this->tempFolder);
+
+        rmdir($path);
     }
 }

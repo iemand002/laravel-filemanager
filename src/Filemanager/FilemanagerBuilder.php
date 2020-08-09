@@ -6,6 +6,7 @@ use Dflydev\ApacheMimeTypes\PhpRepository;
 use Iemand002\Filemanager\models\Uploads;
 use Iemand002\Filemanager\Traits\DropboxHelperTrait;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Intervention\Image\ImageManager;
 
 class FilemanagerBuilder
@@ -39,7 +40,7 @@ class FilemanagerBuilder
             return null;
         }
 
-        $folder = str_finish($upload->folder, '/');
+        $folder = Str::finish($upload->folder, '/');
         $path = $folder . $upload->filename;
 
         if ($upload->provider) {
@@ -82,7 +83,7 @@ class FilemanagerBuilder
      */
     private function makeTransform($transformHandle, $folder, $upload, $transform)
     {
-        $transformFolder = str_finish($folder . '_' . $transformHandle, '/');
+        $transformFolder = Str::finish($folder . '_' . $transformHandle, '/');
         $path = $transformFolder . $upload->filename;
 
         if (!$this->disk->exists($path)) {
@@ -132,7 +133,7 @@ class FilemanagerBuilder
             return $upload;
         }
 
-        $folder = str_finish($upload->folder, '/');
+        $folder = Str::finish($upload->folder, '/');
         $path = $folder . $upload->filename;
 
         if ($transformHandle != null) {

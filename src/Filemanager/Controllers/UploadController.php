@@ -14,6 +14,7 @@ use App\Http\Controllers\Controller;
 
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Str;
 
 
 class UploadController extends Controller
@@ -70,7 +71,7 @@ class UploadController extends Controller
 
         foreach ($data['files'] as $file) {
             if (Uploads::where('filename', $file['name'])->where('folder', $data['folder'])->count() == 0) {
-                $this->saveToDb($file['name'], str_finish($data['folder'], '/'), $file['mimeType']);
+                $this->saveToDb($file['name'], Str::finish($data['folder'], '/'), $file['mimeType']);
             }
         }
 
@@ -115,7 +116,7 @@ class UploadController extends Controller
     public function deleteFile(Request $request)
     {
         $del_file = $request->get('del_file');
-        $result = $this->delFromDb($del_file, str_finish($request->get('folder'), '/'));
+        $result = $this->delFromDb($del_file, Str::finish($request->get('folder'), '/'));
         if ($result === true){
 
             $path = $request->get('folder') . '/' . $del_file;
@@ -179,7 +180,7 @@ class UploadController extends Controller
         } else {
             $fileName = $file_parts['basename'];
         }
-        $folder = str_finish($request->get('folder'), '/');
+        $folder = Str::finish($request->get('folder'), '/');
         $path = $folder . $fileName;
         $content = File::get($file['tmp_name']);
 

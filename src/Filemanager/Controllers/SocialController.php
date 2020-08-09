@@ -3,10 +3,11 @@
 namespace Iemand002\Filemanager\Controllers;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use App\User;
 use Iemand002\Filemanager\models\Social;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
 
 class SocialController extends Controller
@@ -19,11 +20,11 @@ class SocialController extends Controller
         if (empty($providerKey)) {
 
             return redirect()->back()
-                ->withErrors([trans('filemanager::filemanager.provider_not_found',['provider'=>$provider])]);
+                ->withErrors([trans('filemanager::filemanager.provider_not_found', ['provider' => $provider])]);
 
         }
 
-        if(isset($_GET['redirect'])){
+        if (isset($_GET['redirect'])) {
             session()->flash('redirect', $_GET['redirect']);
         }
 
@@ -34,10 +35,10 @@ class SocialController extends Controller
         return Socialite::driver($provider)->redirect();
     }
 
-    public function getSocialHandle($provider)
+    public function getSocialHandle(Request $request, $provider)
     {
 
-        if (Input::get('denied') != '') {
+        if ($request->input('denied') != '') {
             return redirect()->to('/login')
                 ->with('status', 'danger')
                 ->with('message', 'You did not share your profile data with our social app.');
@@ -46,7 +47,7 @@ class SocialController extends Controller
         $user = Socialite::driver($provider)->user();
         $socialUser = null;
 
-        if(auth()->check()){
+        if (auth()->check()) {
             //if user is already logged in, we want to connect an social
             $userCheck = auth()->user();
         } else {
@@ -62,7 +63,7 @@ class SocialController extends Controller
         $email = $user->email;
 
         if (!$user->email) {
-            $email = 'missing' . str_random(10);
+            $email = 'missing' . Str::random(10);
         }
 
         if (!empty($userCheck)) {
@@ -73,15 +74,15 @@ class SocialController extends Controller
                 $socialData = new Social;
                 $socialData->social_id = $user->id;
                 $socialData->provider = $provider;
-                $socialData->token=$user->token;
-                if ($provider=='graph') {
+                $socialData->token = $user->token;
+                if ($provider == 'graph') {
                     $socialData->refresh = $user->refreshToken;
                     $socialData->expires = $user->expiresIn;
                 }
                 $socialUser->socials()->save($socialData);
             } else {
-                if ($provider=='graph') {
-                    $sameSocialId->token=$user->token;
+                if ($provider == 'graph') {
+                    $sameSocialId->token = $user->token;
                     $sameSocialId->refresh = $user->refreshToken;
                     $sameSocialId->expires = $user->expiresIn;
                     $sameSocialId->save();
@@ -96,14 +97,14 @@ class SocialController extends Controller
                 $newSocialUser = new User;
                 $newSocialUser->email = $email;
 
-                $newSocialUser->password = bcrypt(str_random(16));
+                $newSocialUser->password = bcrypt(Str::random(16));
                 $newSocialUser->save();
 
                 $socialData = new Social;
                 $socialData->social_id = $user->id;
                 $socialData->provider = $provider;
-                $socialData->token=$user->token;
-                if ($provider=='graph') {
+                $socialData->token = $user->token;
+                if ($provider == 'graph') {
                     $socialData->refresh = $user->refreshToken;
                     $socialData->expires = $user->expiresIn;
                 }
@@ -114,8 +115,8 @@ class SocialController extends Controller
             } else {
 
                 //Load this existing social user
-                if ($provider=='graph') {
-                    $sameSocialId->token=$user->token;
+                if ($provider == 'graph') {
+                    $sameSocialId->token = $user->token;
                     $sameSocialId->refresh = $user->refreshToken;
                     $sameSocialId->expires = $user->expiresIn;
                     $sameSocialId->save();
@@ -126,17 +127,17 @@ class SocialController extends Controller
 
         }
 
-        if(!auth()->check()){
+        if (!auth()->check()) {
             // if not logged in, log in the (new) user
             auth()->login($socialUser, true);
         }
 
-        if (session('redirect')!=null){
+        if (session('redirect') != null) {
             // if redirect is given
             return redirect(session('redirect'));
         }
 
-        return redirect()->back()->withSuccess(trans('filemanager::filemanager.logged_in_social_provider',['provider'=>$provider]));
+        return redirect()->back()->withSuccess(trans('filemanager::filemanager.logged_in_social_provider', ['provider' => $provider]));
 
     }
 

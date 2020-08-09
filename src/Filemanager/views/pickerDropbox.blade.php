@@ -94,7 +94,7 @@
                         </thead>
                         <tbody>
                         @foreach($data->entries as $entry)
-                            @if(array_key_exists('rev',$entry))
+                            @if(property_exists($entry, 'rev'))
                                 @php
                                     $mimeType = fileMimeType($entry->path_display)
                                 @endphp

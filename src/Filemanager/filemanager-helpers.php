@@ -1,6 +1,7 @@
 <?php
 
 use Iemand002\Filemanager\models\Social;
+use Illuminate\Support\Str;
 
 /**
  * Return sizes readable by humans
@@ -24,7 +25,7 @@ function human_filesize($bytes, $decimals = 2)
  */
 function is_image($mimeType)
 {
-    return starts_with($mimeType, 'image/');
+    return Str::startsWith($mimeType, 'image/');
 }
 
 function fileMimeType($path){

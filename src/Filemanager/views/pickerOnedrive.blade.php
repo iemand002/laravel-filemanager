@@ -97,7 +97,7 @@
                         </thead>
                         <tbody>
                         @foreach($data->value as $entry)
-                            @if(array_key_exists('file',$entry))
+                            @if(property_exists($entry, 'file'))
                                 @php
                                     $mimeType = $entry->file->mimeType
                                 @endphp
@@ -108,7 +108,7 @@
                                                 <input type="checkbox" name="files[]" id="check{{$loop->index}}"
                                                        data-file-id="{{$entry->id}}" data-file-name="{{ $entry->name }}"
                                                        data-file-date="{{ \Carbon\Carbon::createFromTimeString($entry->fileSystemInfo->createdDateTime)->format('Y-m-d H:i:s') }}"
-                                                       data-file-dimension="@if (array_key_exists('image',$entry)){{$entry->image->width}}x{{$entry->image->height}}@endif"
+                                                       data-file-dimension="@if (property_exists($entry, 'image')){{$entry->image->width}}x{{$entry->image->height}}@endif"
                                                        data-file-mime-type="{{$mimeType}}"
                                                 >
                                                 <span class="sr-only">{{trans('filemanager::filemanager.check')}}</span>
@@ -119,10 +119,10 @@
                                         <a class="file" href="#" data-file-id="{{$entry->id}}"
                                            data-file-name="{{ $entry->name }}"
                                            data-file-date="{{ \Carbon\Carbon::createFromTimeString($entry->fileSystemInfo->createdDateTime)->format('Y-m-d H:i:s') }}"
-                                           data-file-dimension="@if (array_key_exists('image',$entry)){{$entry->image->width}}x{{$entry->image->height}}@endif"
+                                           data-file-dimension="@if (property_exists($entry, 'image')){{$entry->image->width}}x{{$entry->image->height}}@endif"
                                            data-file-mime-type="{{$mimeType}}"
                                         >
-                                            @if (array_key_exists('image',$entry))
+                                            @if (property_exists($entry, 'image'))
                                                 <i class="fa fa-file-image-o fa-lg fa-fw"></i>
                                             @else
                                                 <i class="fa fa-file-o fa-lg fa-fw"></i>
@@ -134,7 +134,7 @@
                                     <td>{{ \Carbon\Carbon::createFromTimeString($entry->fileSystemInfo->createdDateTime)->format('j-M-y g:ia') }}</td>
                                     <td>{{ human_filesize($entry->size) }}</td>
                                     <td>
-                                        @if (array_key_exists('image',$entry))
+                                        @if (property_exists($entry, 'image'))
                                             <button type="button" class="btn btn-xs btn-success"
                                                     onclick="preview_image('{{route('filemanager.getPicture',['provider'=>'onedrive', $entry->id])}}')">
                                                 <i class="fa fa-eye fa-lg"></i>

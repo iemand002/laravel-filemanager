@@ -11,6 +11,7 @@
     * 5.5 (version 1.x/2.0), 
     * 5.6/5.7/5.8 (version 2.1)
     * 6.x/7.x (version 2.2)
+    * 8.x (version 2.3)
 * Twitter Bootstrap 4
 * Jquery 3.5
 
@@ -99,11 +100,8 @@ Route::get('demo',function () {
 * Update views to bootstrap 4
 
 ## Changelog
-2.1.0  
-Added: 
-* Dropbox and OneDrive integrations  
-
+2.3.0  
 Changed:  
-* Required L5.6+/PHP7.1+
+* Required L8.x - PHP 7.3+
 
 Check previous changes in CHANGELOG.md

@@ -8,7 +8,7 @@ class Uploads extends Model
 {
     protected $table;
     public $timestamps = true;
-    protected $casts = ['dimension'=>'object'];
+    protected $casts = ['dimension' => 'object'];
 
     /**
      * Uploads constructor.

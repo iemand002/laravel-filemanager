@@ -1,6 +1,6 @@
 @if(config('filemanager.jquery_datatables.use') && config('filemanager.jquery_datatables.cdn'))
-    <script src="https://cdn.datatables.net/1.10.11/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.10.11/js/dataTables.bootstrap.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.21/js/dataTables.bootstrap4.min.js"></script>
 @endif
 <script>
 
@@ -17,7 +17,7 @@
                 @if(config('app.locale') == 'nl')
                 // Load translations
                 "language": {
-                    "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Dutch.json"
+                    "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Dutch.json"
                 },
                 @endif
                 @if(isset($_GET['multi']))

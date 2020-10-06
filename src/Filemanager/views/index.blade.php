@@ -45,7 +45,7 @@
                             <div class="alert alert-success">
                                 <button type="button" class="close" data-dismiss="alert">×</button>
                                 <strong>
-                                    <i class="fa fa-check-circle fa-lg fa-fw"></i> {{trans('filemanager::filemanager.success')}}
+                                    <i class="fa fa-check-circle fa-lg"></i> {{trans('filemanager::filemanager.success')}}
                                 </strong>
                                 {{ Session::get('success') }}
                             </div>
@@ -81,7 +81,7 @@
                                 <tr>
                                     <td>
                                         <a href="{{route('filemanager.index')}}?folder={{ $path }}">
-                                            <i class="fa fa-folder fa-lg fa-fw"></i>
+                                            <i class="fa fa-folder fa-lg"></i>
                                             {{ $name }}
                                         </a>
                                     </td>
@@ -104,9 +104,9 @@
                                     <td>
                                         <a href="{{ $file['webPath'] }}">
                                             @if (is_image($file['mimeType']))
-                                                <i class="fa fa-file-image-o fa-lg fa-fw"></i>
+                                                <i class="fa fa-file-image-o fa-lg"></i>
                                             @else
-                                                <i class="fa fa-file-o fa-lg fa-fw"></i>
+                                                <i class="fa fa-file-o fa-lg"></i>
                                             @endif
                                             {{ $file['name'] }}
                                         </a>

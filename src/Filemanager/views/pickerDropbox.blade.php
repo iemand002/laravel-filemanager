@@ -1,10 +1,12 @@
 @extends(config('filemanager.extend_layout.picker'))
+
 @section('pagetitle')
     {{trans('filemanager::filemanager.file_manager_dropbox')}}
 @endsection
-@section(config('filemanager.css_section'))
+
+@push(config('filemanager.css_section'))
     @if(config('filemanager.jquery_datatables.use')&&config('filemanager.jquery_datatables.cdn'))
-        <link href="https://cdn.datatables.net/1.10.11/css/dataTables.bootstrap.min.css " type="text/css"
+        <link href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css" type="text/css"
               rel="stylesheet">
     @endif
     <style>
@@ -17,7 +19,8 @@
             display: block;
         }
     </style>
-@endsection
+@endpush
+
 @section(config('filemanager.content_section'))
     @php
         $urlParams = '';
@@ -36,30 +39,30 @@
         <div class="row page-title-row">
             <div class="col-md-6">
                 <h3 class="pull-left">{{trans('filemanager::filemanager.file_manager_dropbox')}} </h3>
-                <div class="pull-left">
-                    <ul class="breadcrumb">
+                <nav class="pull-left">
+                    <ol class="breadcrumb">
                         @php
                             $link = route('filemanager.picker') . "?folder=" . $urlParams;
                         @endphp
-                        <li><a href="{{$link}}">root</a></li>
+                        <li class="breadcrumb-item"><a href="{{ $link }}"><i class="fas fa-home"></i></a></li>
                         @php
                             $link = route('filemanager.pickerCloud','dropbox') . "?folder=&cloud=dropbox". $urlParams;
                         @endphp
-                        <li><a href="{{$link}}"><i class="fa fa-dropbox"></i> Dropbox</a></li>
-                        @for($i=0;$i<sizeof($folder);$i++)
+                        <li class="breadcrumb-item"><a href="{{ $link }}"><i class="fab fa-dropbox"></i> Dropbox</a></li>
+                        @for($i = 0; $i < sizeof($folder); $i++)
                             @if($folder[$i]!='')
                                 @php
                                     $link = route('filemanager.pickerCloud','dropbox') . "?folder=". substr($folder[$i],1) . '&cloud=dropbox' . $urlParams;
                                 @endphp
                                 @if($i==sizeof($folder)-1)
-                                    <li class="active">{{$folder_split[$i]}}</li>
+                                    <li class="breadcrumb-item active" aria-current="page">{{ $folder_split[$i] }}</li>
                                 @else
-                                    <li><a href="{{$link}}">{{$folder_split[$i]}}</a></li>
+                                    <li class="breadcrumb-item"><a href="{{ $link }}">{{ $folder_split[$i] }}</a></li>
                                 @endif
                             @endif
                         @endfor
-                    </ul>
-                </div>
+                    </ol>
+                </nav>
             </div>
             <div class="col-md-6 text-right">
                 @if(isset($_GET['multi']))
@@ -81,15 +84,15 @@
                                 <th data-sortable="false" class="checkbox-label">
                                     <label for="check-all">
                                         <input type="checkbox" id="check-all"><span
-                                                class="sr-only">{{trans('filemanager::filemanager.check_all')}}</span>
+                                                class="sr-only">{{ trans('filemanager::filemanager.check_all') }}</span>
                                     </label>
                                 </th>
                             @endif
-                            <th>{{trans('filemanager::filemanager.name')}}</th>
-                            <th>{{trans('filemanager::filemanager.type')}}</th>
-                            <th>{{trans('filemanager::filemanager.date')}}</th>
-                            <th>{{trans('filemanager::filemanager.Size')}}</th>
-                            <th data-sortable="false">{{trans('filemanager::filemanager.actions')}}</th>
+                            <th>{{ trans('filemanager::filemanager.name') }}</th>
+                            <th>{{ trans('filemanager::filemanager.type') }}</th>
+                            <th>{{ trans('filemanager::filemanager.date') }}</th>
+                            <th>{{ trans('filemanager::filemanager.Size') }}</th>
+                            <th data-sortable="false">{{ trans('filemanager::filemanager.actions') }}</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -101,28 +104,28 @@
                                 <tr>
                                     @if(isset($_GET['multi']))
                                         <td class="checkbox-label">
-                                            <label for="check{{$loop->index}}">
-                                                <input type="checkbox" name="files[]" id="check{{$loop->index}}"
-                                                       data-file-id="{{$entry->id}}" data-file-name="{{ $entry->name }}"
+                                            <label for="check{{ $loop->index }}">
+                                                <input type="checkbox" name="files[]" id="check{{ $loop->index }}"
+                                                       data-file-id="{{ $entry->id }}" data-file-name="{{ $entry->name }}"
                                                        data-file-date="{{ \Carbon\Carbon::createFromTimeString($entry->client_modified)->format('Y-m-d H:i:s') }}"
-                                                       data-file-dimension="@if (isset($entry->media_info->metadata->dimensions)){{$entry->media_info->metadata->dimensions->width}}x{{$entry->media_info->metadata->dimensions->height}}@endif"
-                                                       data-file-mime-type="{{$mimeType}}"
+                                                       data-file-dimension="@if (isset($entry->media_info->metadata->dimensions)){{ $entry->media_info->metadata->dimensions->width }}x{{ $entry->media_info->metadata->dimensions->height }}@endif"
+                                                       data-file-mime-type="{{ $mimeType }}"
                                                 >
-                                                <span class="sr-only">{{trans('filemanager::filemanager.check')}}</span>
+                                                <span class="sr-only">{{ trans('filemanager::filemanager.check') }}</span>
                                             </label>
                                         </td>
                                     @endif
                                     <td>
-                                        <a class="file" href="#" data-file-id="{{$entry->id}}"
+                                        <a class="file" href="#" data-file-id="{{ $entry->id }}"
                                            data-file-name="{{ $entry->name }}"
                                            data-file-date="{{ \Carbon\Carbon::createFromTimeString($entry->client_modified)->format('Y-m-d H:i:s') }}"
-                                           data-file-dimension="@if (isset($entry->media_info->metadata->dimensions)){{$entry->media_info->metadata->dimensions->width}}x{{$entry->media_info->metadata->dimensions->height}}@endif"
-                                           data-file-mime-type="{{$mimeType}}"
+                                           data-file-dimension="@if (isset($entry->media_info->metadata->dimensions)){{ $entry->media_info->metadata->dimensions->width }}x{{ $entry->media_info->metadata->dimensions->height }}@endif"
+                                           data-file-mime-type="{{ $mimeType }}"
                                         >
                                             @if (is_image($mimeType))
-                                                <i class="fa fa-file-image-o fa-lg fa-fw"></i>
+                                                <i class="far fa-file-image"></i>
                                             @else
-                                                <i class="fa fa-file-o fa-lg fa-fw"></i>
+                                                <i class="far fa-file-alt"></i>
                                             @endif
                                             {{ $entry->name }}
                                         </a>
@@ -132,10 +135,10 @@
                                     <td>{{ human_filesize($entry->size) }}</td>
                                     <td>
                                         @if (is_image($mimeType))
-                                            <button type="button" class="btn btn-xs btn-success"
-                                                    onclick="preview_image('{{route('filemanager.getPicture',['provider'=>'dropbox', $entry->id])}}')">
-                                                <i class="fa fa-eye fa-lg"></i>
-                                                {{trans('filemanager::filemanager.preview')}}
+                                            <button type="button" class="btn btn-sm btn-success"
+                                                    onclick="preview_image('{{ route('filemanager.getPicture',['provider'=>'dropbox', $entry->id]) }}')">
+                                                <i class="fa fa-eye"></i>
+                                                {{ trans('filemanager::filemanager.preview') }}
                                             </button>
                                         @endif
                                     </td>
@@ -150,11 +153,11 @@
                                             $link = route('filemanager.pickerCloud',['dropbox']) . "?folder=" . str_replace('%2F','/',rawurlencode(substr($entry->path_lower,1))) . '&cloud=dropbox'. $urlParams;
                                         @endphp
                                         <a href="{{$link}}">
-                                            <i class="fa fa-folder fa-lg fa-fw"></i>
-                                            {{$entry->name}}
+                                            <i class="fa fa-folder"></i>
+                                            {{ $entry->name }}
                                         </a>
                                     </td>
-                                        <td>{{trans('filemanager::filemanager.folder')}}</td>
+                                        <td>{{ trans('filemanager::filemanager.folder') }}</td>
                                         <td>-</td>
                                         <td>-</td>
                                         <td>-</td>
@@ -174,6 +177,6 @@
 
 @stop
 
-@section(config('filemanager.javascript_section'))
+@push(config('filemanager.javascript_section'))
     @include('iemand002/filemanager::_pickerJs')
-@stop
+@endpush

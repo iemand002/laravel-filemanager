@@ -1,10 +1,12 @@
 @extends(config('filemanager.extend_layout.picker'))
+
 @section('pagetitle')
     {{trans('filemanager::filemanager.file_manager_onedrive')}}
 @endsection
-@section(config('filemanager.css_section'))
+
+@push(config('filemanager.css_section'))
     @if(config('filemanager.jquery_datatables.use')&&config('filemanager.jquery_datatables.cdn'))
-        <link href="https://cdn.datatables.net/1.10.11/css/dataTables.bootstrap.min.css " type="text/css"
+        <link href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css" type="text/css"
               rel="stylesheet">
     @endif
     <style>
@@ -17,12 +19,13 @@
             display: block;
         }
     </style>
-@endsection
+@endpush
+
 @section(config('filemanager.content_section'))
     @php
         $urlParams = '';
         if (isset($_GET['CKEditor']))
-            $urlParams .= "&CKEditor=".$_GET['CKEditor']."&CKEditorFuncNum=".$_GET['CKEditorFuncNum'];
+            $urlParams .= "&CKEditor=" . $_GET['CKEditor']."&CKEditorFuncNum=" . $_GET['CKEditorFuncNum'];
         if (isset($_GET['id']))
             $urlParams .= "&id=" . $_GET['id'];
         if (isset($_GET['file']))
@@ -35,39 +38,43 @@
         {{-- Top Bar --}}
         <div class="row page-title-row">
             <div class="col-md-6">
-                <h3 class="pull-left">{{trans('filemanager::filemanager.file_manager_onedrive')}} </h3>
-                <div class="pull-left">
-                    <ul class="breadcrumb">
+                <h3 class="pull-left">{{ trans('filemanager::filemanager.file_manager_onedrive') }} </h3>
+                <nav class="pull-left">
+                    <ol class="breadcrumb">
                         @php
                             $link = route('filemanager.picker') . "?folders=" . $urlParams;
                         @endphp
-                        <li><a href="{{$link}}">root</a></li>
+                        <li class="breadcrumb-item"><a href="{{ $link }}"><i class="fas fa-home"></i></a></li>
                         @php
                             $link = route('filemanager.pickerCloud','onedrive') . "?folder=&cloud=onedrive". $urlParams;
-                            $parent=explode('/',$data->value[0]->parentReference->path);
+                            $parent = explode('/',$data->value[0]->parentReference->path);
                         @endphp
-                        <li><a href="{{$link}}"><i class="fa fa-windows"></i> OneDrive</a></li>
-                        @php $foldersUrl=$foldersByName='' @endphp
+                        <li class="breadcrumb-item"><a href="{{ $link }}"><i class="fab fa-windows"></i> OneDrive</a></li>
+                        @php $foldersUrl = $foldersByName = '' @endphp
                         @foreach($folders as $folder)
-                            @if($folder!='')
+                            @if($folder != '')
                                 @php
-                                    $foldersUrl=($foldersUrl!=''?$foldersUrl.'-':'').$folder;
-                                    $foldersByName = urldecode($parent[3+$loop->index]);
+                                    $foldersUrl = ($foldersUrl!=''?$foldersUrl.'-':'') . $folder;
+                                    $foldersByName = urldecode($parent[3 + $loop->index]);
                                 @endphp
                                 @if(end($folders)==$folder)
-                                    <li class="active">{{urldecode($parent[3+$loop->index])}}</li>
+                                    <li class="breadcrumb-item active">{{ urldecode($parent[3 + $loop->index]) }}</li>
                                 @else
-                                    <li><a href="{{route('filemanager.pickerCloud','onedrive') . "?folder=" . $foldersByName . "&folders=".$foldersUrl . '&cloud=onedrive' . $urlParams }}">{{urldecode($parent[3+$loop->index])}}</a></li>
+                                    <li class="breadcrumb-item">
+                                        <a href="{{ route('filemanager.pickerCloud','onedrive') . "?folder=" . $foldersByName . "&folders=" . $foldersUrl . '&cloud=onedrive' . $urlParams }}">
+                                            {{ urldecode($parent[3+$loop->index]) }}
+                                        </a>
+                                    </li>
                                 @endif
                             @endif
                         @endforeach
-                    </ul>
-                </div>
+                    </ol>
+                </nav>
             </div>
             <div class="col-md-6 text-right">
                 @if(isset($_GET['multi']))
                     <button type="button" class="btn btn-info btn-md" disabled="disabled" id="multi-add">
-                        <i class="fa fa-check-square"></i> {{trans('filemanager::filemanager.select')}}
+                        <i class="fa fa-check-square"></i> {{ trans('filemanager::filemanager.select') }}
                     </button>
                 @endif
             </div>
@@ -88,11 +95,11 @@
                                     </label>
                                 </th>
                             @endif
-                            <th>{{trans('filemanager::filemanager.name')}}</th>
-                            <th>{{trans('filemanager::filemanager.type')}}</th>
-                            <th>{{trans('filemanager::filemanager.date')}}</th>
-                            <th>{{trans('filemanager::filemanager.Size')}}</th>
-                            <th data-sortable="false">{{trans('filemanager::filemanager.actions')}}</th>
+                            <th>{{ trans('filemanager::filemanager.name') }}</th>
+                            <th>{{ trans('filemanager::filemanager.type') }}</th>
+                            <th>{{ trans('filemanager::filemanager.date') }}</th>
+                            <th>{{ trans('filemanager::filemanager.Size') }}</th>
+                            <th data-sortable="false">{{ trans('filemanager::filemanager.actions') }}</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -104,14 +111,14 @@
                                 <tr>
                                     @if(isset($_GET['multi']))
                                         <td class="checkbox-label">
-                                            <label for="check{{$loop->index}}">
-                                                <input type="checkbox" name="files[]" id="check{{$loop->index}}"
+                                            <label for="check{{ $loop->index }}">
+                                                <input type="checkbox" name="files[]" id="check{{ $loop->index }}"
                                                        data-file-id="{{$entry->id}}" data-file-name="{{ $entry->name }}"
                                                        data-file-date="{{ \Carbon\Carbon::createFromTimeString($entry->fileSystemInfo->createdDateTime)->format('Y-m-d H:i:s') }}"
-                                                       data-file-dimension="@if (property_exists($entry, 'image')){{$entry->image->width}}x{{$entry->image->height}}@endif"
-                                                       data-file-mime-type="{{$mimeType}}"
+                                                       data-file-dimension="@if (property_exists($entry, 'image')){{ $entry->image->width }}x{{ $entry->image->height }}@endif"
+                                                       data-file-mime-type="{{ $mimeType }}"
                                                 >
-                                                <span class="sr-only">{{trans('filemanager::filemanager.check')}}</span>
+                                                <span class="sr-only">{{ trans('filemanager::filemanager.check') }}</span>
                                             </label>
                                         </td>
                                     @endif
@@ -119,13 +126,13 @@
                                         <a class="file" href="#" data-file-id="{{$entry->id}}"
                                            data-file-name="{{ $entry->name }}"
                                            data-file-date="{{ \Carbon\Carbon::createFromTimeString($entry->fileSystemInfo->createdDateTime)->format('Y-m-d H:i:s') }}"
-                                           data-file-dimension="@if (property_exists($entry, 'image')){{$entry->image->width}}x{{$entry->image->height}}@endif"
-                                           data-file-mime-type="{{$mimeType}}"
+                                           data-file-dimension="@if (property_exists($entry, 'image')){{ $entry->image->width }}x{{ $entry->image->height }}@endif"
+                                           data-file-mime-type="{{ $mimeType }}"
                                         >
                                             @if (property_exists($entry, 'image'))
-                                                <i class="fa fa-file-image-o fa-lg fa-fw"></i>
+                                                <i class="far fa-file-image"></i>
                                             @else
-                                                <i class="fa fa-file-o fa-lg fa-fw"></i>
+                                                <i class="far fa-file-alt"></i>
                                             @endif
                                             {{ $entry->name }}
                                         </a>
@@ -135,10 +142,10 @@
                                     <td>{{ human_filesize($entry->size) }}</td>
                                     <td>
                                         @if (property_exists($entry, 'image'))
-                                            <button type="button" class="btn btn-xs btn-success"
-                                                    onclick="preview_image('{{route('filemanager.getPicture',['provider'=>'onedrive', $entry->id])}}')">
+                                            <button type="button" class="btn btn-sm btn-success"
+                                                    onclick="preview_image('{{ route('filemanager.getPicture',['provider'=>'onedrive', $entry->id]) }}')">
                                                 <i class="fa fa-eye fa-lg"></i>
-                                                {{trans('filemanager::filemanager.preview')}}
+                                                {{ trans('filemanager::filemanager.preview') }}
                                             </button>
                                         @endif
                                     </td>
@@ -150,14 +157,14 @@
                                     @endif
                                     <td>
                                         @php
-                                            $link = route('filemanager.pickerCloud',['onedrive']) . "?folder=" . ($foldersByName==''?$entry->name:$foldersByName . "/" . $entry->name) . "&folders=" . ($foldersUrl!=''?$foldersUrl.'-':'').$entry->id . '&cloud=onedrive'. $urlParams;
+                                            $link = route('filemanager.pickerCloud', ['onedrive']) . "?folder=" . ($foldersByName == '' ? $entry->name : $foldersByName . "/" . $entry->name) . "&folders=" . ($foldersUrl != '' ? $foldersUrl . '-' : '') . $entry->id . '&cloud=onedrive'. $urlParams;
                                         @endphp
                                         <a href="{{$link}}">
-                                            <i class="fa fa-folder fa-lg fa-fw"></i>
-                                            {{$entry->name}}
+                                            <i class="fa fa-folder"></i>
+                                            {{ $entry->name }}
                                         </a>
                                     </td>
-                                        <td>{{trans('filemanager::filemanager.folder')}}</td>
+                                        <td>{{ trans('filemanager::filemanager.folder') }}</td>
                                         <td>-</td>
                                         <td>-</td>
                                         <td>-</td>
@@ -177,6 +184,6 @@
 
 @stop
 
-@section(config('filemanager.javascript_section'))
+@push(config('filemanager.javascript_section'))
     @include('iemand002/filemanager::_pickerJs')
-@stop
+@endpush

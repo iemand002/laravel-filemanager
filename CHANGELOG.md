@@ -1,4 +1,12 @@
 # Changelog
+## 2.2.0
+Changed:
+* Updated to Laravel 6 and 7
+* Updated to bootstrap 4
+* Updated to jQuery 3
+* Changed js and css `@section` to `@stack` and `@push` 
+* Updated to Fontawesome 5
+
 ##2.1.1
 Added:  
 * Config setting to choose `bigIncrements` and `bigInteger` usage  

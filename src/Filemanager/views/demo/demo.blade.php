@@ -2,61 +2,60 @@
 
 @section('content')
     <div class="container">
-        <div class="content">
-            <div class="row">
-                <h3>Single</h3>
+        <h3>Single</h3>
+        <div class="form-group row">
+            <label for="filename" class='col-sm-2 control-label'>Filepicker</label>
+            <div class="col-sm-6">
+                <div class="input-group">
+                    <input type="hidden" id="upload_id" name="upload_id">
+                    <input type="text" name="upload_filename" id='filename' class='form-control'
+                           placeholder="{{trans('filemanager::filemanager.choose_file')}}">
+                    <div class="input-group-append">
+                        <button class="btn btn-primary" type="button"
+                                onclick="window.open('{{route('filemanager.picker')}}?id=upload_id&file=filename','imagepicker', 'width=1000,height=500,scrollbars=yes,toolbar=no,location=no'); return false">
+                            {{trans('filemanager::filemanager.choose_file')}}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <h3>Multi</h3>
+        <div id="pictures" class="row">
+            @php
+              $i = 1;
+            @endphp
+
+            <input type="hidden" name="picturecount" value="{{$i-1}}" id="picturecount">
+            <div class="col-md-4" id="pic{{$i}}">
                 <div class="form-group">
-                    <label for="filename" class='col-sm-2 control-label'>Filepicker</label>
-                    <div class="col-sm-6">
-                        <div class="input-group">
-                            <input type="hidden" id="upload_id" name="upload_id">
-                            <input type="text" name="upload_filename" id='filename' class='form-control'
-                                   placeholder="{{trans('filemanager::filemanager.choose_file')}}">
-                            <span class="input-group-btn">
-                            <button class="btn btn-default" type="button"
-                                    onclick="window.open('{{route('filemanager.picker')}}?id=upload_id&file=filename','imagepicker', 'width=1000,height=500,scrollbars=yes,toolbar=no,location=no'); return false">
-                                    {{trans('filemanager::filemanager.choose_file')}}
-                            </button>
-                        </span>
-                        </div>
+                    <img alt="dummy placeholder" src="/img/dummy.png" class="img img-fluid"
+                         id="image-preview{{$i}}">
+                    <div class="input-group">
+                        <input type="hidden" name="picture{{$i}}" id="picture{{$i}}">
+                        <input type="hidden" id="upload_id{{$i}}" name="upload_id{{$i}}" data-count="{{$i}}">
+                        <button id="picker{{$i}}" type="button" class="btn btn-success"
+                                onclick="window.open('{{route('filemanager.picker')}}?id=upload_id{{$i}}&file=picture{{$i}}&add=true&multi=true','imagepicker', 'width=1000,height=500,scrollbars=yes,toolbar=no,location=no'); return false">
+                            <i class="fa fa-plus-circle"></i> {{trans('filemanager::filemanager.choose_picture')}}
+                        </button>
                     </div>
                 </div>
             </div>
-            <div class="row">
-                <h3>Multi</h3>
-                <div id="pictures" class="row">
-                    <?php $i = 1;?>
+        </div>
 
-                    <input type="hidden" name="picturecount" value="{{$i-1}}" id="picturecount">
-                    <div class="col-md-4" id="pic{{$i}}">
-                        <div class="form-group">
-                            <img alt="dummy placeholder" src="/img/dummy.png" class="img img-responsive"
-                                 id="image-preview{{$i}}">
-                            <div class="input-group">
-                                <input type="hidden" name="picture{{$i}}" id="picture{{$i}}">
-                                <input type="hidden" id="upload_id{{$i}}" name="upload_id{{$i}}" data-count="{{$i}}">
-                                <button id="picker{{$i}}" type="button" class="btn btn-success"
-                                        onclick="window.open('{{route('filemanager.picker')}}?id=upload_id{{$i}}&file=picture{{$i}}&add=true&multi=true','imagepicker', 'width=1000,height=500,scrollbars=yes,toolbar=no,location=no'); return false">
-                                    <i class="fa fa-plus-circle"></i> {{trans('filemanager::filemanager.choose_picture')}}
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <h3>CKEditor</h3>
+        <div class="row">
+            <label for="body" class="col-12">Text</label>
+            <div class="col-12">
+                <textarea class="form-control" id="body"></textarea>
             </div>
-            <div class="row">
-                <h3>CKEditor</h3>
-                <label for="body">Text</label>
-                <textarea id="body"></textarea>
 
 
-            </div>
         </div>
     </div>
 @endsection
 
-@section('js')
-    <script src="https://cdn.ckeditor.com/4.11.2/standard/ckeditor.js"></script>
+@push(config('filemanager.javascript_section'))
+    <script src="//cdn.ckeditor.com/4.14.1/standard/ckeditor.js"></script>
     <script>
         $(function () {
             CKEDITOR.replace('body', {
@@ -70,8 +69,7 @@
         // Listen to localstorage change
         $(window).on('storage', message_receive);
 
-        function message_receive(ev)
-        {
+        function message_receive(ev) {
             if (ev.originalEvent.key !== 'fm_data') return; // ignore other keys
             var data = JSON.parse(ev.originalEvent.newValue);
             if (!data) return; // ignore empty msg or msg reset
@@ -86,10 +84,10 @@
                 upload_id.value = file.fileId;
                 document.getElementById(data.file).value = folder + file.fileName;
                 handle_image_change(parseInt(upload_id.dataset.count), data.webPath);
-                if (count + 1 === parseInt(upload_id.dataset.count)){
+                if (count + 1 === parseInt(upload_id.dataset.count)) {
                     // add a new dummy if needed
                     count++;
-                    add_dummy(count+1);
+                    add_dummy(count + 1);
                 }
             } else {
                 for (var i = 0; i < data.files.length; i++) {
@@ -125,7 +123,7 @@
             // add the new dummy
             $("#pictures").append('<div class="col-md-4" id="pic' + count + '">' +
                 '<div class="form-group">' +
-                '<img alt="dummy placeholder" src="/img/dummy.png" class="img img-responsive" id="image-preview' + count + '">' +
+                '<img alt="dummy placeholder" src="/img/dummy.png" class="img img-fluid" id="image-preview' + count + '">' +
                 '<div class="input-group">' +
                 '<input id="picture' + count + '" name="picture' + count + '" type="hidden">' +
                 '<input id="upload_id' + count + '" name="upload_id' + count + '" data-count="' + count + '" type="hidden">' +
@@ -139,4 +137,4 @@
             $("#picturecount").val(count - 1);
         }
     </script>
-@endsection
+@endpush

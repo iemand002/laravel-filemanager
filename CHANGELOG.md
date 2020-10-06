@@ -1,7 +1,15 @@
 # Changelog
+##2.3.1
+Fixed:
+* Filemanager `index.blade.php` styling fixes
+
 ##2.3.0
 Changed: 
 * Required L8.x - PHP 7.3+
+
+##2.2.1
+Fixed:
+* Filemanager `index.blade.php` styling fixes
 
 ##2.2.0
 Changed:

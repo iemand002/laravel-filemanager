@@ -100,8 +100,8 @@ Route::get('demo',function () {
 * Update views to bootstrap 4
 
 ## Changelog
-2.3.0  
-Changed:  
-* Required L8.x - PHP 7.3+
+2.3.1
+Fixed:
+* Filemanager `index.blade.php` styling fixes
 
 Check previous changes in CHANGELOG.md

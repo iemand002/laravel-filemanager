@@ -1,38 +1,44 @@
 @extends(config('filemanager.extend_layout.normal'))
+
 @section('pagetitle')
     {{trans('filemanager::filemanager.file_manager')}}
 @endsection
-@section(config('filemanager.pagetitle_section'))
-    @if(config('filemanager.jquery_datatables.use')&&config('filemanager.jquery_datatables.cdn'))
-        <link href="https://cdn.datatables.net/1.10.11/css/dataTables.bootstrap.min.css " type="text/css"
+
+@push(config('filemanager.css_section'))
+    @if(config('filemanager.jquery_datatables.use') && config('filemanager.jquery_datatables.cdn'))
+        <link href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css" type="text/css"
               rel="stylesheet">
     @endif
-@endsection
+@endpush
+
 @section(config('filemanager.content_section'))
-    @if(config('filemanager.include_container')!='none')
-        <div class="{{(config('filemanager.include_container')=='fluid')?'container-fluid':'container'}}">
+    @if(config('filemanager.include_container') != 'none')
+        <div class="{{ config('filemanager.include_container') == 'fluid' ? 'container-fluid' : 'container' }}">
             @endif
             {{-- Top Bar --}}
             <div class="row page-title-row">
-                <div class="col-xs-6">
-                    <h3 class="pull-left">{{trans('filemanager::filemanager.uploads')}}  </h3>
-                    <div class="pull-left">
-                        <ul class="breadcrumb">
+                <div class="col-md-6">
+                    <h3 class="pull-left">{{ trans('filemanager::filemanager.uploads') }}</h3>
+                    <nav class="pull-left" aria-label="breadcrumb">
+                        <ol class="breadcrumb">
                             @foreach ($breadcrumbs as $path => $disp)
-                                <li><a href="{{route('filemanager.index')}}?folder={{ $path }}">{{ $disp }}</a></li>
+                                @php
+                                    $link = route('filemanager.picker') . "?folder=" . $path;
+                                @endphp
+                                <li class="breadcrumb-item"><a href="{{ $link }}">@if($disp == 'root')<i class="fas fa-home"></i>@else{{ $disp }}@endif</a></li>
                             @endforeach
-                            <li class="active">{{ $folderName }}</li>
-                        </ul>
-                    </div>
+                            <li class="breadcrumb-item active" aria-current="page">@if($folderName == 'root')<i class="fas fa-home"></i>@else{{ $folderName }}@endif</li>
+                        </ol>
+                    </nav>
                 </div>
-                <div class="col-xs-6 text-right">
+                <div class="col-md-6 text-right">
                     <button type="button" class="btn btn-success btn-md"
                             data-toggle="modal" data-target="#modal-folder-create">
-                        <i class="fa fa-plus-circle"></i> {{trans('filemanager::filemanager.new_folder')}}
+                        <i class="fa fa-plus-circle"></i> {{ trans('filemanager::filemanager.new_folder') }}
                     </button>
                     <button type="button" class="btn btn-primary btn-md"
                             data-toggle="modal" data-target="#modal-file-upload">
-                        <i class="fa fa-upload"></i> {{trans('filemanager::filemanager.upload')}}
+                        <i class="fa fa-upload"></i> {{ trans('filemanager::filemanager.upload') }}
                     </button>
                 </div>
             </div>
@@ -41,11 +47,11 @@
                 <div class="col-sm-12">
 
                     @if(config('filemanager.alert_messages.normal'))
-                        @if (Session::has('success'))
+                        @if(Session::has('success'))
                             <div class="alert alert-success">
                                 <button type="button" class="close" data-dismiss="alert">×</button>
                                 <strong>
-                                    <i class="fa fa-check-circle fa-lg"></i> {{trans('filemanager::filemanager.success')}}
+                                    <i class="fa fa-check-circle"></i> {{ trans('filemanager::filemanager.success') }}
                                 </strong>
                                 {{ Session::get('success') }}
                             </div>
@@ -53,7 +59,7 @@
                         @if($errors->any())
                             <div class="alert alert-danger">
                                 <button type="button" class="close" data-dismiss="alert">×</button>
-                                <strong>{{trans('filemanager::filemanager.whoops')}}</strong>
+                                <strong>{{ trans('filemanager::filemanager.whoops') }}</strong>
                                 <ul class="list">
                                     @foreach($errors->all() as $error)
                                         <li>{{ $error }}</li>
@@ -67,32 +73,68 @@
                         <table id="uploads-table" class="table table-striped table-bordered">
                             <thead>
                             <tr>
-                                <th>{{trans('filemanager::filemanager.name')}}</th>
-                                <th>{{trans('filemanager::filemanager.type')}}</th>
-                                <th>{{trans('filemanager::filemanager.date')}}</th>
-                                <th>{{trans('filemanager::filemanager.Size')}}</th>
-                                <th data-sortable="false">{{trans('filemanager::filemanager.actions')}}</th>
+                                <th>{{ trans('filemanager::filemanager.name') }}</th>
+                                <th>{{ trans('filemanager::filemanager.type') }}</th>
+                                <th>{{ trans('filemanager::filemanager.date') }}</th>
+                                <th>{{ trans('filemanager::filemanager.Size') }}</th>
+                                <th data-sortable="false">{{ trans('filemanager::filemanager.actions') }}</th>
                             </tr>
                             </thead>
                             <tbody>
+
+                            @if(is_dropbox_loggedIn())
+                                <tr>
+                                    <td>
+                                        @php
+                                            $link = route('filemanager.pickerCloud',["dropbox",""]) . "?folder=" . $urlParams . '&cloud=dropbox';
+                                        @endphp
+                                        <a href="{{ $link }}">
+                                            <i class="fab fa-dropbox"></i>
+                                            Dropbox
+                                        </a>
+                                    </td>
+                                    <td>{{ trans('filemanager::filemanager.cloud') }}</td>
+                                    <td>-</td>
+                                    <td>-</td>
+                                    <td>-</td>
+                                </tr>
+                            @endif
+
+                            @if(is_onedrive_loggedIn())
+                                <tr>
+                                    <td>
+                                        @php
+                                            $link = route('filemanager.pickerCloud',["onedrive",""]) . "?folder=" . $urlParams . '&cloud=onedrive';
+                                        @endphp
+                                        <a href="{{ $link }}">
+                                            <i class="fab fa-windows"></i>
+                                            OneDrive
+                                        </a>
+                                    </td>
+                                    <td>{{ trans('filemanager::filemanager.cloud') }}</td>
+                                    <td>-</td>
+                                    <td>-</td>
+                                    <td>-</td>
+                                </tr>
+                            @endif
 
                             {{-- The Subfolders --}}
                             @foreach ($subfolders as $path => $name)
                                 <tr>
                                     <td>
-                                        <a href="{{route('filemanager.index')}}?folder={{ $path }}">
-                                            <i class="fa fa-folder fa-lg"></i>
+                                        <a href="{{ route('filemanager.index') }}?folder={{ $path }}">
+                                            <i class="fa fa-folder"></i>
                                             {{ $name }}
                                         </a>
                                     </td>
-                                    <td>{{trans('filemanager::filemanager.folder')}}</td>
+                                    <td>{{ trans('filemanager::filemanager.folder') }}</td>
                                     <td>-</td>
                                     <td>-</td>
                                     <td>
-                                        <button type="button" class="btn btn-xs btn-danger"
+                                        <button type="button" class="btn btn-sm btn-danger"
                                                 onclick="delete_folder('{{ $name }}')">
-                                            <i class="fa fa-times-circle fa-lg"></i>
-                                            {{trans('filemanager::filemanager.delete')}}
+                                            <i class="fa fa-times-circle"></i>
+                                            {{ trans('filemanager::filemanager.delete') }}
                                         </button>
                                     </td>
                                 </tr>
@@ -104,9 +146,9 @@
                                     <td>
                                         <a href="{{ $file['webPath'] }}">
                                             @if (is_image($file['mimeType']))
-                                                <i class="fa fa-file-image-o fa-lg"></i>
+                                                <i class="far fa-file-image"></i>
                                             @else
-                                                <i class="fa fa-file-o fa-lg"></i>
+                                                <i class="far fa-file-alt"></i>
                                             @endif
                                             {{ $file['name'] }}
                                         </a>
@@ -115,16 +157,16 @@
                                     <td>{{ $file['modified']->format('j-M-y g:ia') }}</td>
                                     <td>{{ human_filesize($file['size']) }}</td>
                                     <td>
-                                        <button type="button" class="btn btn-xs btn-danger"
+                                        <button type="button" class="btn btn-sm btn-danger"
                                                 onclick="delete_file('{{ $file['name'] }}')">
-                                            <i class="fa fa-times-circle fa-lg"></i>
-                                            {{trans('filemanager::filemanager.delete')}}
+                                            <i class="fa fa-times-circle"></i>
+                                            {{ trans('filemanager::filemanager.delete') }}
                                         </button>
                                         @if (is_image($file['mimeType']))
-                                            <button type="button" class="btn btn-xs btn-success"
+                                            <button type="button" class="btn btn-sm btn-success"
                                                     onclick="preview_image('{{ $file['webPath'] }}')">
-                                                <i class="fa fa-eye fa-lg"></i>
-                                                {{trans('filemanager::filemanager.preview')}}
+                                                <i class="fa fa-eye"></i>
+                                                {{ trans('filemanager::filemanager.preview') }}
                                             </button>
                                         @endif
                                     </td>
@@ -142,14 +184,11 @@
     @endif
 
     @include('iemand002/filemanager::_modals')
+    @include('iemand002/filemanager::_modalView')
 
 @stop
 
-@section(config('filemanager.javascript_section'))
-    @if(config('filemanager.jquery_datatables.use')&&config('filemanager.jquery_datatables.cdn'))
-        <script src="//cdn.datatables.net/1.10.11/js/jquery.dataTables.min.js"></script>
-        <script src="//cdn.datatables.net/1.10.11/js/dataTables.bootstrap.min.js"></script>
-    @endif
+@push(config('filemanager.javascript_section'))
     <script>
 
         // Confirm file delete
@@ -166,22 +205,6 @@
             $("#modal-folder-delete").modal("show");
         }
 
-        // Preview image
-        function preview_image(path) {
-            $("#preview-image").attr("src", path);
-            $("#modal-image-view").modal("show");
-        }
-
-        @if(config('filemanager.jquery_datatables.use'))
-        $(function () {
-            $("#uploads-table").DataTable({
-                @if(Config::get('app.locale')=='nl')
-                "language": {
-                    "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Dutch.json"
-                }
-                @endif
-            });
-        });
-        @endif
     </script>
-@stop
+    @include('iemand002/filemanager::_pickerJs')
+@endpush

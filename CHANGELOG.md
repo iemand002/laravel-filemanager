@@ -1,7 +1,12 @@
 # Changelog
+
+## 2.2.1
+Fixed:  
+* Filemanager `index.blade.php` styling fixes
+
 ## 2.2.0
 Changed:
-* Updated to Laravel 6 and 7
+* Requires L6.x/L7.x - PHP 7.2.5+
 * Updated to bootstrap 4
 * Updated to jQuery 3
 * Changed js and css `@section` to `@stack` and `@push` 

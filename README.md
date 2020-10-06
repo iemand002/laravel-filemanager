@@ -96,14 +96,11 @@ Route::get('demo',function () {
 ## TODO
 * Find out what's wrong with the graph login, it works, but giving errors sometimes
 * Cloud remove reference in database if file is removed from the cloud
-* Update views to bootstrap 4
+* Add cloud views to index
 
 ## Changelog
-2.1.0  
-Added: 
-* Dropbox and OneDrive integrations  
-
-Changed:  
-* Required L5.6+/PHP7.1+
+2.2.1  
+Fixed:  
+* Filemanager `index.blade.php` styling fixes
 
 Check previous changes in CHANGELOG.md

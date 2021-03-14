@@ -10,23 +10,7 @@
         $("#modal-image-view").modal("show");
     }
 
-    @if(config('filemanager.jquery_datatables.use'))
-        // init data tables plugin
-        $(function () {
-            $("#uploads-table").DataTable({
-                @if(config('app.locale') == 'nl')
-                // Load translations
-                "language": {
-                    "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Dutch.json"
-                },
-                @endif
-                @if(isset($_GET['multi']))
-                // Change default order column
-                "order": [[1, 'asc']]
-                @endif
-            });
-        });
-    @endif
+
 
     function getUrlParam(paramName) {
         var reParam = new RegExp('(?:[\?&]|&)' + paramName + '=([^&]+)', 'i');
@@ -45,39 +29,41 @@
         data.cloud = getUrlParam('cloud') != null ? getUrlParam('cloud') : 'local';
         data.webPath = (getUrlParam('cloud') != null ? '{{env('APP_URL')}}' + getUrlParam('cloud') + '/' : '{{config('filesystems.disks.' . config('filesystems.' .  config('filemanager.uploads.storage')) . '.url')}}');
 
-        if (getUrlParam('multi')) {
-            var btnMulti = $('#multi-add');
+        function initMultiFile() {
+            if (getUrlParam('multi')) {
+                var btnMulti = $('#multi-add');
 
-            $('#check-all').click(function (e) {
-                var state = this.checked;
-                // Iterate each checkbox
-                $('input[name="files[]').each(function () {
-                    this.checked = state;
+                $('#check-all').click(function (e) {
+                    var state = this.checked;
+                    // Iterate each checkbox
+                    $('input[name="files[]').each(function () {
+                        this.checked = state;
+                    });
+                    btnMulti.attr('disabled', !state)
                 });
-                btnMulti.attr('disabled', !state)
-            });
 
-            // multi add
-            $('input[name="files[]"').change(function (e) {
-                if ($('[name="files[]"]:checked').length > 0) {
-                    btnMulti.removeAttr('disabled');
-                } else {
+                // multi add
+                $('input[name="files[]"').change(function (e) {
+                    if ($('[name="files[]"]:checked').length > 0) {
+                        btnMulti.removeAttr('disabled');
+                    } else {
+                        btnMulti.attr('disabled', 'disabled');
+                    }
+                });
+
+                btnMulti.click(function (e) {
+                    e.preventDefault();
+                    data.type = 'multi';
                     btnMulti.attr('disabled', 'disabled');
-                }
-            });
-
-            btnMulti.click(function (e) {
-                e.preventDefault();
-                data.type = 'multi';
-                btnMulti.attr('disabled', 'disabled');
 
 
-                $('[name="files[]"]:checked').each(function () {
-                    files.push($(this).data());
-                });
-                data.files = files;
-                saveSocial(data);
-            })
+                    $('[name="files[]"]:checked').each(function () {
+                        files.push($(this).data());
+                    });
+                    data.files = files;
+                    saveSocial(data);
+                })
+            }
         }
 
         function callCkeditor(data) {
@@ -95,13 +81,15 @@
             window.close();
         }
 
-        $('a.file').click(function (e) {
-            // single add
-            e.preventDefault();
-            data.type = 'single';
-            data.files = [$(this).data()];
-            saveSocial(data);
-        });
+        function initFileClick() {
+            $('a.file').click(function (e) {
+                // single add
+                e.preventDefault();
+                data.type = 'single';
+                data.files = [$(this).data()];
+                saveSocial(data);
+            });
+        }
 
         function saveSocial(data) {
             if (data.cloud !== 'local') {
@@ -135,5 +123,27 @@
             localStorage.removeItem('fm_data');
             window.close();
         }
+
+        @if(config('filemanager.jquery_datatables.use'))
+        // init data tables plugin
+            $("#uploads-table").DataTable({
+                @if(config('app.locale') == 'nl')
+                // Load translations
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Dutch.json"
+                },
+                @endif
+                @if(isset($_GET['multi']))
+                // Change default order column
+                "order": [[1, 'asc']]
+                @endif
+            }).on('draw', function(){
+                initFileClick();
+                initMultiFile();
+            });
+        @else
+            initFileClick();
+            initMultiFile();
+        @endif
     })
 </script>

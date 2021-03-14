@@ -47,7 +47,7 @@
                     <ol class="breadcrumb">
                         @foreach ($breadcrumbs as $path => $disp)
                             @php
-                                $link = route('filemanager.picker') . "?folder=" . $path . '&cloud=dropbox' . $urlParams;
+                                $link = route('filemanager.picker') . "?folder=" . $path . $urlParams;
                             @endphp
                             <li class="breadcrumb-item"><a href="{{ $link }}">@if($disp == 'root')<i class="fas fa-home"></i>@else{{ $disp }}@endif</a></li>
                         @endforeach

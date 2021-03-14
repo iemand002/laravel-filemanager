@@ -1,10 +1,15 @@
 # Changelog
 
-## 2.2.1
+## 2.2.2  
+Fixed:
+* DataTables paging and search not updating picker events
+* Breadcrumbs had Dropbox path where it shouldn't
+
+## 2.2.1  
 Fixed:  
 * Filemanager `index.blade.php` styling fixes
 
-## 2.2.0
+## 2.2.0  
 Changed:
 * Requires L6.x/L7.x - PHP 7.2.5+
 * Updated to bootstrap 4
@@ -12,14 +17,14 @@ Changed:
 * Changed js and css `@section` to `@stack` and `@push` 
 * Updated to Fontawesome 5
 
-##2.1.1
+## 2.1.1  
 Added:  
 * Config setting to choose `bigIncrements` and `bigInteger` usage  
 
 Changed
 * Use `bigIncrements` and `bigInteger` by default in migrations
 
-##2.1.0  
+## 2.1.0  
 Added: 
 * Dropbox and OneDrive integrations
 
@@ -59,4 +64,3 @@ Added:
 
 Fix:
 * Simplified config
-

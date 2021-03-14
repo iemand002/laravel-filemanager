@@ -99,8 +99,9 @@ Route::get('demo',function () {
 * Add cloud views to index
 
 ## Changelog
-2.2.1  
+2.2.2  
 Fixed:  
-* Filemanager `index.blade.php` styling fixes
+* DataTables paging and search not updating picker events
+* Breadcrumbs had Dropbox path where it shouldn't
 
 Check previous changes in CHANGELOG.md

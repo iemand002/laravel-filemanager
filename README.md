@@ -90,18 +90,20 @@ Route::get('demo',function () {
 });
 ````
 
-## Build-in languages
+## Build-in languages  
 * Dutch (nl)
 * English (en)
 
-## TODO
+## TODO  
 * Find out what's wrong with the graph login, it works, but giving errors sometimes
 * Cloud remove reference in database if file is removed from the cloud
 * Update views to bootstrap 4
 
-## Changelog
-2.3.1
-Fixed:
-* Filemanager `index.blade.php` styling fixes
+## Changelog  
+2.3.2  
+Fixed:  
+* DataTables paging and search not updating picker events
+* Breadcrumbs had Dropbox path where it shouldn't
+* Fix multi add checkbox logic
 
-Check previous changes in CHANGELOG.md
+[Check previous changes in CHANGELOG.md](CHANGELOG.md)

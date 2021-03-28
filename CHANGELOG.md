@@ -1,25 +1,36 @@
-# Changelog
-##2.3.1
+# Changelog  
+## 2.3.2  
 Fixed:
+* DataTables paging and search not updating picker events
+* Breadcrumbs had Dropbox path where it shouldn't
+* Fix multi add checkbox logic
+
+## 2.3.1  
+Fixed:  
 * Filemanager `index.blade.php` styling fixes
 
-##2.3.0
+## 2.3.0  
 Changed: 
 * Required L8.x - PHP 7.3+
 
-##2.2.1
-Fixed:
+## 2.2.1  
+Fixed:  
 * Filemanager `index.blade.php` styling fixes
 
-##2.2.0
-Changed:
+## 2.2.0  
+Changed:  
 * Required L6.x/L7.x - PHP 7.2.5+
 * Updated to bootstrap 4
 * Updated to jQuery 3
 * Changed js and css `@section` to `@stack` and `@push` 
 * Updated to Fontawesome 5
 
-##2.1.1
+## 2.2.2
+Fixed:
+* DataTables paging and search not updating picker events
+* Breadcrumbs had Dropbox path where it shouldn't
+
+## 2.2.1  
 Added:  
 * Config setting to choose `bigIncrements` and `bigInteger` usage  
 
@@ -66,4 +77,3 @@ Added:
 
 Fix:
 * Simplified config
-

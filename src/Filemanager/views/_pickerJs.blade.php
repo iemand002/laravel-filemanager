@@ -10,23 +10,6 @@
         $("#modal-image-view").modal("show");
     }
 
-    @if(config('filemanager.jquery_datatables.use'))
-        // init data tables plugin
-        $(function () {
-            $("#uploads-table").DataTable({
-                @if(config('app.locale') == 'nl')
-                // Load translations
-                "language": {
-                    "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Dutch.json"
-                },
-                @endif
-                @if(isset($_GET['multi']))
-                // Change default order column
-                "order": [[1, 'asc']]
-                @endif
-            });
-        });
-    @endif
 
     function getUrlParam(paramName) {
         var reParam = new RegExp('(?:[\?&]|&)' + paramName + '=([^&]+)', 'i');
@@ -37,8 +20,6 @@
     $(function () {
         var data = {};
         var files = [];
-        var saved = false;
-        var sent = false;
         data.id = getUrlParam('id');
         data.file = getUrlParam('file');
         data.folder = (getUrlParam('folder') != null) ? getUrlParam('folder') + (getUrlParam('folder') === '/' ? '' : '/') : '/';
@@ -46,35 +27,59 @@
         data.webPath = (getUrlParam('cloud') != null ? '{{env('APP_URL')}}' + getUrlParam('cloud') + '/' : '{{config('filesystems.disks.' . config('filesystems.' .  config('filemanager.uploads.storage')) . '.url')}}');
 
         if (getUrlParam('multi')) {
-            var btnMulti = $('#multi-add');
+            var $btnMulti = $('#multi-add');
+            var $checkAll = $('#check-all');
 
-            $('#check-all').click(function (e) {
+            $checkAll.click(function (e) {
                 var state = this.checked;
                 // Iterate each checkbox
                 $('input[name="files[]').each(function () {
+                    var checkboxData = $(this).data();
                     this.checked = state;
+
+                    if (state) {
+                        if (!files.includes(checkboxData)) {
+                            files.push(checkboxData)
+                        }
+                    } else {
+                        files = files.filter(function (item) {
+                            return item !== checkboxData;
+                        });
+                    }
                 });
-                btnMulti.attr('disabled', !state)
+                $btnMulti.attr('disabled', !state);
             });
 
-            // multi add
-            $('input[name="files[]"').change(function (e) {
-                if ($('[name="files[]"]:checked').length > 0) {
-                    btnMulti.removeAttr('disabled');
+            function updateButtons() {
+                $checkAll.prop('checked', $('input[name="files[]"]').length === $('input[name="files[]"]:checked').length);
+
+                if (files.length > 0) {
+                    $btnMulti.removeAttr('disabled');
                 } else {
-                    btnMulti.attr('disabled', 'disabled');
+                    $btnMulti.attr('disabled', 'disabled');
                 }
-            });
+            }
 
-            btnMulti.click(function (e) {
+            function initMultiFile() {
+                updateButtons();
+                // multi add
+                $('input[name="files[]"]').unbind('change').change(function (e) {
+                    var checkboxData = $(this).data();
+                    if (files.includes(checkboxData)) {
+                        files = files.filter(function (item) {
+                            return item !== checkboxData;
+                        });
+                    } else {
+                        files.push(checkboxData)
+                    }
+                    updateButtons();
+                });
+            }
+
+            $btnMulti.click(function (e) {
                 e.preventDefault();
                 data.type = 'multi';
-                btnMulti.attr('disabled', 'disabled');
-
-
-                $('[name="files[]"]:checked').each(function () {
-                    files.push($(this).data());
-                });
+                $btnMulti.attr('disabled', 'disabled');
                 data.files = files;
                 saveSocial(data);
             })
@@ -95,13 +100,15 @@
             window.close();
         }
 
-        $('a.file').click(function (e) {
-            // single add
-            e.preventDefault();
-            data.type = 'single';
-            data.files = [$(this).data()];
-            saveSocial(data);
-        });
+        function initFileClick() {
+            $('a.file').click(function (e) {
+                // single add
+                e.preventDefault();
+                data.type = 'single';
+                data.files = [$(this).data()];
+                saveSocial(data);
+            });
+        }
 
         function saveSocial(data) {
             if (data.cloud !== 'local') {
@@ -135,5 +142,27 @@
             localStorage.removeItem('fm_data');
             window.close();
         }
+
+        @if(config('filemanager.jquery_datatables.use'))
+            // init data tables plugin
+            $("#uploads-table").DataTable({
+                @if(config('app.locale') == 'nl')
+                // Load translations
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Dutch.json"
+                },
+                @endif
+                @if(isset($_GET['multi']))
+                // Change default order column
+                "order": [[1, 'asc']]
+                @endif
+            }).on('draw', function(){
+                initFileClick();
+                initMultiFile();
+            });
+        @else
+            initFileClick();
+            initMultiFile();
+        @endif
     })
 </script>

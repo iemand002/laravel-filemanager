@@ -3,14 +3,11 @@
     <script src="https://cdn.datatables.net/1.10.21/js/dataTables.bootstrap4.min.js"></script>
 @endif
 <script>
-
     // Preview image
     function preview_image(path) {
         $("#preview-image").attr("src", path);
         $("#modal-image-view").modal("show");
     }
-
-
 
     function getUrlParam(paramName) {
         var reParam = new RegExp('(?:[\?&]|&)' + paramName + '=([^&]+)', 'i');
@@ -21,49 +18,69 @@
     $(function () {
         var data = {};
         var files = [];
-        var saved = false;
-        var sent = false;
         data.id = getUrlParam('id');
         data.file = getUrlParam('file');
         data.folder = (getUrlParam('folder') != null) ? getUrlParam('folder') + (getUrlParam('folder') === '/' ? '' : '/') : '/';
         data.cloud = getUrlParam('cloud') != null ? getUrlParam('cloud') : 'local';
         data.webPath = (getUrlParam('cloud') != null ? '{{env('APP_URL')}}' + getUrlParam('cloud') + '/' : '{{config('filesystems.disks.' . config('filesystems.' .  config('filemanager.uploads.storage')) . '.url')}}');
 
-        function initMultiFile() {
-            if (getUrlParam('multi')) {
-                var btnMulti = $('#multi-add');
+        if (getUrlParam('multi')) {
+            var $btnMulti = $('#multi-add');
+            var $checkAll = $('#check-all');
 
-                $('#check-all').click(function (e) {
-                    var state = this.checked;
-                    // Iterate each checkbox
-                    $('input[name="files[]').each(function () {
-                        this.checked = state;
-                    });
-                    btnMulti.attr('disabled', !state)
-                });
+            $checkAll.click(function (e) {
+                var state = this.checked;
+                // Iterate each checkbox
+                $('input[name="files[]').each(function () {
+                    var checkboxData = $(this).data();
+                    this.checked = state;
 
-                // multi add
-                $('input[name="files[]"').change(function (e) {
-                    if ($('[name="files[]"]:checked').length > 0) {
-                        btnMulti.removeAttr('disabled');
+                    if (state) {
+                        if (!files.includes(checkboxData)) {
+                            files.push(checkboxData)
+                        }
                     } else {
-                        btnMulti.attr('disabled', 'disabled');
+                        files = files.filter(function (item) {
+                            return item !== checkboxData;
+                        });
                     }
                 });
+                $btnMulti.attr('disabled', !state);
+            });
 
-                btnMulti.click(function (e) {
-                    e.preventDefault();
-                    data.type = 'multi';
-                    btnMulti.attr('disabled', 'disabled');
+            function updateButtons() {
+                $checkAll.prop('checked', $('input[name="files[]"]').length === $('input[name="files[]"]:checked').length);
 
-
-                    $('[name="files[]"]:checked').each(function () {
-                        files.push($(this).data());
-                    });
-                    data.files = files;
-                    saveSocial(data);
-                })
+                if (files.length > 0) {
+                    $btnMulti.removeAttr('disabled');
+                } else {
+                    $btnMulti.attr('disabled', 'disabled');
+                }
             }
+
+            function initMultiFile() {
+                updateButtons();
+                // multi add
+                $('input[name="files[]"]').unbind('change').change(function (e) {
+                    var checkboxData = $(this).data();
+                    if (files.includes(checkboxData)) {
+                        files = files.filter(function (item) {
+                            return item !== checkboxData;
+                        });
+                    } else {
+                        files.push(checkboxData)
+                    }
+                    updateButtons();
+                });
+            }
+
+            $btnMulti.click(function (e) {
+                e.preventDefault();
+                data.type = 'multi';
+                $btnMulti.attr('disabled', 'disabled');
+                data.files = files;
+                saveSocial(data);
+            })
         }
 
         function callCkeditor(data) {
@@ -125,7 +142,7 @@
         }
 
         @if(config('filemanager.jquery_datatables.use'))
-        // init data tables plugin
+            // init data tables plugin
             $("#uploads-table").DataTable({
                 @if(config('app.locale') == 'nl')
                 // Load translations

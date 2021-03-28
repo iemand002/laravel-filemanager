@@ -1,4 +1,7 @@
 # Changelog
+## 2.2.3  
+Fixed:  
+* Fix multi add checkbox logic
 
 ## 2.2.2  
 Fixed:

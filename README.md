@@ -99,9 +99,8 @@ Route::get('demo',function () {
 * Add cloud views to index
 
 ## Changelog
-2.2.2  
-Fixed:  
-* DataTables paging and search not updating picker events
-* Breadcrumbs had Dropbox path where it shouldn't
+2.2.3  
+Fixed:
+* Fix multi add checkbox logic
 
-Check previous changes in CHANGELOG.md
+[Check previous changes in CHANGELOG.md](CHANGELOG.md)

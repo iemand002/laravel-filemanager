@@ -1,0 +1,45 @@
+td, th {
+  &.checkbox-label {
+    padding: 0;
+
+    label {
+      padding: 8px;
+      margin: 0;
+      display: block;
+    }
+  }
+
+  .file, &.mimeType {
+    word-break: break-all;
+  }
+}
+
+@media (min-width: 768px) {
+  .collapse {
+    display: block !important;
+  }
+}
+
+.folder {
+  padding-left: 20px;
+  display: block;
+  position: relative;
+
+  &:before {
+    content: "\f07b";
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    position: absolute;
+    left: 0;
+  }
+
+  &.folder-windows:before {
+    content: "\f17a";
+    font-family: "Font Awesome 5 Brands";
+  }
+
+  &.folder-dropbox:before {
+    content: "\f16b";
+    font-family: "Font Awesome 5 Brands";
+  }
+}

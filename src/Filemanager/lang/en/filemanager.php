@@ -13,6 +13,8 @@ return [
     'Size' => 'Size',
     'actions' => 'Actions',
     'folder' => 'Folder',
+    'folders' => 'Folders',
+    'no_folders' => 'No Folders',
     'file' => 'File',
     'optional_filename' => 'Optional Filename',
     'preview' => 'Preview',

@@ -54,9 +54,46 @@ class UploadController extends Controller
     public function picker(Request $request)
     {
         $folder = $request->get('folder');
-        $data = $this->manager->folderInfo($folder);
+        if (config('filemanager.jquery_datatables.use')){
+            $data = $this->manager->folderInfoSubfolders($folder);
+        } else {
+            $data = $this->manager->folderInfo($folder);
+        }
 
         return view('iemand002/filemanager::picker', $data);
+    }
+
+    public function ajax(Request $request)
+    {
+        $folder = $request->get('folder');
+        $rawData = $this->manager->folderInfoUploads($folder);
+        $data = [];
+        foreach ($rawData as $row) {
+            $data[] = [
+                'multi' => [
+                  'id' => $row['id'],
+                  'name' => $row['name'],
+                ],
+                'link' => [
+                    'id' => $row['id'],
+                    'name' => $row['name'],
+                    'isImage' => is_image($row['mimeType']),
+                ],
+                'type' => $row['mimeType'] ?? 'Unknown',
+                'modified' => [
+                    'display' => $row['modified']->format('j-M-y g:ia'),
+                    'sort' => $row['modified']->format('X'),
+                ],
+                'size' => human_filesize($row['size']),
+                'buttons' => [
+                  'name' => $row['name'],
+                    'isImage' => is_image($row['mimeType']),
+                  'webPath' => $row['webPath'],
+                ],
+            ];
+        }
+
+        return json_encode(['data'=>$data]);
     }
 
     /**

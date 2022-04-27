@@ -13,6 +13,8 @@ return [
     'Size' => 'Grootte',
     'actions' => 'Acties',
     'folder' => 'Map',
+    'folders' => 'Mappen',
+    'no_folders' => 'Geen mappen',
     'file' => 'Bestand',
     'optional_filename' => 'Optionele Bestandsnaam',
     'preview' => 'Preview',

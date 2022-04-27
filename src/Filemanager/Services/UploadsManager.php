@@ -112,6 +112,39 @@ class UploadsManager
         );
     }
 
+    public function folderInfoSubfolders($folder) {
+        $folder = $this->cleanFolder($folder);
+
+        $breadcrumbs = $this->breadcrumbs($folder);
+        $slice = array_slice($breadcrumbs, -1);
+        $folderName = current($slice);
+        $breadcrumbs = array_slice($breadcrumbs, 0, -1);
+
+        $subfolders = [];
+        foreach (array_unique($this->disk->directories($folder)) as $subfolder) {
+            if (!Str::startsWith(basename($subfolder), '_')) {
+                $subfolders["/$subfolder"] = basename($subfolder);
+            }
+        }
+
+        return compact(
+            'folder',
+            'folderName',
+            'breadcrumbs',
+            'subfolders',
+        );
+    }
+
+    public function folderInfoUploads($folder) {
+        $folder = $this->cleanFolder($folder);
+        $uploads = Uploads::where('folder', Str::finish($folder, '/'))->where('provider', null)->get();
+        $files = [];
+        foreach ($uploads as $upload) {
+            $files[] = $this->fileDetails($upload);
+        }
+        return $files;
+    }
+
     /**
      * Sanitize the folder name
      *

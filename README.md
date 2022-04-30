@@ -12,6 +12,7 @@
     * 5.6/5.7/5.8 (version 2.1)
     * 6.x/7.x (version 2.2)
     * 8.x (version 2.3)
+    * 9.x (version 3.0)
 * Twitter Bootstrap 4
 * Jquery 3.5
 
@@ -97,13 +98,4 @@ Route::get('demo',function () {
 ## TODO  
 * Find out what's wrong with the graph login, it works, but giving errors sometimes
 * Cloud remove reference in database if file is removed from the cloud
-* Update views to bootstrap 4
-
-## Changelog  
-2.3.2  
-Fixed:  
-* DataTables paging and search not updating picker events
-* Breadcrumbs had Dropbox path where it shouldn't
-* Fix multi add checkbox logic
-
-[Check previous changes in CHANGELOG.md](CHANGELOG.md)
+* Update views to bootstrap 5

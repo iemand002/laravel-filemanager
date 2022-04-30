@@ -11,10 +11,10 @@
         }
     ],
     "require": {
-        "php" : "^7.3.0",
-        "illuminate/config": "8.*",
-        "illuminate/database": "8.*",
-        "illuminate/support": "8.*",
+        "php" : "^8.0.2",
+        "illuminate/config": "9.*",
+        "illuminate/database": "9.*",
+        "illuminate/support": "9.*",
         "intervention/image": "^2.4",
         "dflydev/apache-mime-types": "^1.0",
         "nesbot/carbon": "^2.0"

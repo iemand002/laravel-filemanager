@@ -1,4 +1,8 @@
 # Changelog  
+## 3.0.0
+* Laravel 9
+* Fix dropbox integration
+
 ## 2.3.2  
 Fixed:
 * DataTables paging and search not updating picker events

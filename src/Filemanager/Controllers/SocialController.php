@@ -32,6 +32,10 @@ class SocialController extends Controller
             return Socialite::driver($provider)->scopes(['openid', 'Files.ReadWrite', 'Files.ReadWrite.All', 'Sites.ReadWrite.All', 'offline_access'])->redirect();
         }
 
+        if ($provider == 'dropbox') {
+            return Socialite::driver($provider)->scopes(['account_info.read', 'files.metadata.read', 'files.content.read'])->redirect();
+        }
+
         return Socialite::driver($provider)->redirect();
     }
 

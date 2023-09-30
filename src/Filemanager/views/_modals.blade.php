@@ -5,7 +5,7 @@
             <form method="POST" action="{{ route('filemanager.create-folder') }}"
                   class="form-horizontal">
                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                <input type="hidden" name="folder" value="{{ $folder }}">
+                <input type="hidden" name="path" value="{{ $folder }}">
                 <div class="modal-header">
                     <h5 class="modal-title">{{ trans('filemanager::filemanager.create') }} {{ trans('filemanager::filemanager.new_folder') }}</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="{{ trans('filemanager::filemanager.close') }}">
@@ -86,7 +86,7 @@
                 <p class="lead">
                     <i class="fa fa-question-circle fa-lg"></i>
                     {{ trans('filemanager::filemanager.are_you_sure_del') }}
-                    <kbd><span id="delete-folder-name1">{{ strtolower(trans('filemanager::filemanager.folder')) }}</span></kbd>
+                    <kbd><span id="delete-folder-name1">{{ Str::headline($folderName) }}</span></kbd>
                     {{ strtolower(trans('filemanager::filemanager.folder')) }}?
                 </p>
             </div>
@@ -94,8 +94,7 @@
                 <form method="POST" action="{{ route('filemanager.delete-folder') }}">
                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
                     <input type="hidden" name="_method" value="DELETE">
-                    <input type="hidden" name="folder" value="{{ $folder }}">
-                    <input type="hidden" name="del_folder" id="delete-folder-name2">
+                    <input type="hidden" name="path" value="{{ $folder }}">
                     <button type="button" class="btn btn-light" data-dismiss="modal" aria-label="{{ trans('filemanager::filemanager.cancel') }}">
                         {{ trans('filemanager::filemanager.cancel') }}
                     </button>

@@ -9,7 +9,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <img id="preview-image" src="" class="img-fluid">
+                <img id="preview-image" src="" class="img-fluid" alt="">
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" data-dismiss="modal" aria-label="{{ trans('filemanager::filemanager.close') }}">

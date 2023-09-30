@@ -77,11 +77,9 @@ class CloudController extends Controller
             case 'dropbox':
                 $social = Social::where('user_id', $pic->added_by_id)->where('provider', 'dropbox')->first();
                 return $this->getDropboxPic($pic, $size, $social);
-                break;
             case 'onedrive':
                 $social = Social::where('user_id', $pic->added_by_id)->where('provider', 'graph')->first();
                 return $this->getOnedrivePic($pic, $size, $social);
-                break;
             default;
         }
         return null;

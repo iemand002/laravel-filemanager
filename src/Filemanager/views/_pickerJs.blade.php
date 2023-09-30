@@ -151,15 +151,16 @@
                     $("#delete-file-name1").html(name);
                     $("#delete-file-name2").val(name);
                     $("#modal-file-delete").modal("show");
-                })})
+                });
+            });
             $(".btn-image").each(function(){
                 $(this).click(function (e) {
                     e.preventDefault();
                     var path = $(this).data('path')
                     $("#preview-image").attr("src", path);
                     $("#modal-image-view").modal("show");
-                })
-            })
+                });
+            });
         }
 
         @if(config('filemanager.jquery_datatables.use'))
@@ -217,6 +218,9 @@
                         render: function (data, type, row, meta) {
                             if (type === 'display') {
                                 return data.display;
+                            }
+                            if (type === 'sort') {
+                                return data.sort;
                             }
                             return data;
                         },

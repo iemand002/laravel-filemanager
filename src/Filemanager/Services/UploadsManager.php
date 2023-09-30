@@ -5,18 +5,36 @@ namespace Iemand002\Filemanager\Services;
 use Carbon\Carbon;
 use Dflydev\ApacheMimeTypes\PhpRepository;
 use Exception;
+use Iemand002\Filemanager\models\Transforms;
 use Iemand002\Filemanager\models\Uploads;
+use Illuminate\Config\Repository;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Intervention\Image\ImageManager;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class UploadsManager
 {
     protected $disk;
     protected $mimeDetect;
+    /**
+     * @var string
+     */
+    private $tempFolder;
+    /**
+     * @var Repository|Application|mixed
+     */
+    private $library;
+    /**
+     * @var Repository|Application|mixed
+     */
+    private $quality;
+    /**
+     * @var ImageManager
+     */
+    private $intervention;
 
     /**
      * UploadsManager constructor.
@@ -35,50 +53,50 @@ class UploadsManager
         $this->intervention->configure(['driver' => $this->library]);
     }
 
-    /**
-     * Return files and directories within a folder found in the database
-     *
-     * @param string $folder
-     * @return array of [
-     *    'folder' => 'path to current folder',
-     *    'folderName' => 'name of just current folder',
-     *    'breadCrumbs' => breadcrumb array of [ $path => $foldername ]
-     *    'folders' => array of [ $path => $foldername] of each subfolder
-     *    'files' => array of file details on each file in folder
-     * ]
-     */
-    public function folderInfo($folder)
-    {
-        $folder = $this->cleanFolder($folder);
-
-        $breadcrumbs = $this->breadcrumbs($folder);
-        $slice = array_slice($breadcrumbs, -1);
-        $folderName = current($slice);
-        $breadcrumbs = array_slice($breadcrumbs, 0, -1);
-
-        $uploads = Uploads::where('folder', Str::finish($folder, '/'))->where('provider', null)->get();
-
-        $subfolders = [];
-        foreach (array_unique($this->disk->directories($folder)) as $subfolder) {
-            if (!Str::startsWith(basename($subfolder), '_')) {
-                $subfolders["/$subfolder"] = basename($subfolder);
-            }
-        }
-
-        $files = [];
-        foreach ($uploads as $upload) {
-            $files[] = $this->fileDetails($upload);
-        }
-
-        return compact(
-            'folder',
-            'folderName',
-            'breadcrumbs',
-            'subfolders',
-            'files'
-        );
-    }
-
+//    /**
+//     * Return files and directories within a folder found in the database
+//     *
+//     * @param string $folder
+//     * @return array of [
+//     *    'folder' => 'path to current folder',
+//     *    'folderName' => 'name of just current folder',
+//     *    'breadCrumbs' => breadcrumb array of [ $path => $foldername ]
+//     *    'folders' => array of [ $path => $foldername] of each subfolder
+//     *    'files' => array of file details on each file in folder
+//     * ]
+//     */
+//    public function folderInfo($folder)
+//    {
+//        $folder = $this->cleanFolder($folder);
+//
+//        $breadcrumbs = $this->breadcrumbs($folder);
+//        $slice = array_slice($breadcrumbs, -1);
+//        $folderName = current($slice);
+//        $breadcrumbs = array_slice($breadcrumbs, 0, -1);
+//
+//        $uploads = Uploads::where('folder', Str::finish($folder, '/'))->where('provider', null)->get();
+//
+//        $subfolders = [];
+//        foreach (array_unique($this->disk->directories($folder)) as $subfolder) {
+//            if (!Str::startsWith(basename($subfolder), '_')) {
+//                $subfolders["/$subfolder"] = basename($subfolder);
+//            }
+//        }
+//
+//        $files = [];
+//        foreach ($uploads as $upload) {
+//            $files[] = $this->fileDetails($upload);
+//        }
+//
+//        return compact(
+//            'folder',
+//            'folderName',
+//            'breadcrumbs',
+//            'subfolders',
+//            'files'
+//        );
+//    }
+//
     /**
      * Return files and directories within a folder found on the disk
      *
@@ -89,30 +107,31 @@ class UploadsManager
      *    'files' => array of file details on each file in folder
      * ]
      */
-    public function folderInfoDisk($folder)
+    public function folderInfoDisk(string $folder): array
     {
         $folder = $this->cleanFolder($folder);
 
-        $subfolders = [];
-        foreach (array_unique($this->disk->directories($folder)) as $subfolder) {
-            if (!Str::startsWith(basename($subfolder), '_')) {
-                $subfolders["/$subfolder"] = basename($subfolder);
+        $subFolders = [];
+        foreach (array_unique($this->disk->directories($folder)) as $subFolder) {
+            if (!Str::startsWith(basename($subFolder), '_')) {
+                $subFolders["/$subFolder"] = basename($subFolder);
             }
         }
 
         $files = [];
         foreach ($this->disk->files($folder) as $path) {
-            $files[] = $this->fileDetailsDisk($path);
+            $files[] = $this->fileDetailsDisk($path, $folder);
         }
 
         return compact(
             'folder',
-            'subfolders',
+            'subFolders',
             'files'
         );
     }
 
-    public function folderInfoSubfolders($folder) {
+    public function folderInfoSubfolders($folder): array
+    {
         $folder = $this->cleanFolder($folder);
 
         $breadcrumbs = $this->breadcrumbs($folder);
@@ -120,10 +139,10 @@ class UploadsManager
         $folderName = current($slice);
         $breadcrumbs = array_slice($breadcrumbs, 0, -1);
 
-        $subfolders = [];
-        foreach (array_unique($this->disk->directories($folder)) as $subfolder) {
-            if (!Str::startsWith(basename($subfolder), '_')) {
-                $subfolders["/$subfolder"] = basename($subfolder);
+        $subFolders = [];
+        foreach (array_unique($this->disk->directories($folder)) as $subFolder) {
+            if (!Str::startsWith(basename($subFolder), '_')) {
+                $subFolders["/$subFolder"] = basename($subFolder);
             }
         }
 
@@ -131,11 +150,12 @@ class UploadsManager
             'folder',
             'folderName',
             'breadcrumbs',
-            'subfolders',
+            'subFolders',
         );
     }
 
-    public function folderInfoUploads($folder) {
+    public function folderInfoUploads($folder): array
+    {
         $folder = $this->cleanFolder($folder);
         $uploads = Uploads::where('folder', Str::finish($folder, '/'))->where('provider', null)->get();
         $files = [];
@@ -151,7 +171,7 @@ class UploadsManager
      * @param $folder
      * @return string
      */
-    protected function cleanFolder($folder)
+    protected function cleanFolder($folder): string
     {
         return '/' . trim(str_replace('..', '', $folder), '/');
     }
@@ -162,7 +182,7 @@ class UploadsManager
      * @param $folder
      * @return array
      */
-    protected function breadcrumbs($folder)
+    protected function breadcrumbs($folder): array
     {
         $folder = trim($folder, '/');
         $crumbs = ['/' => 'root'];
@@ -187,7 +207,7 @@ class UploadsManager
      * @param Uploads $upload
      * @return array
      */
-    public function fileDetails(Uploads $upload)
+    public function fileDetails(Uploads $upload): array
     {
         $path = $upload->folder . $upload->filename;
 
@@ -197,49 +217,37 @@ class UploadsManager
             'fullPath' => $path,
             'webPath' => $this->disk->url($path),
             'mimeType' => $upload->mimeType,
-            'size' => $this->fileSize($path),
-            'modified' => $this->fileModified($path),
+            'size' => $upload->size,
+            'dimension' => $upload->dimension,
+            'time_taken' => $upload->time_taken,
         ];
+    }
+
+    public function diskFilePath($path): string
+    {
+        return $this->disk->path($path);
     }
 
     /**
      * Return an array of file details for a file
      *
      * @param $path
+     * @param $folder
      * @return array
      */
-    public function fileDetailsDisk($path)
+    public function fileDetailsDisk($path, $folder): array
     {
         $path = '/' . ltrim($path, '/');
 
+        $mimeType = $this->disk->mimeType($path);
+
         return [
             'name' => basename($path),
-            'mimeType' => $this->fileMimeType($path),
+            'folder' => Str::finish($folder, '/'),
+            'path' => $path,
+            'type' => $mimeType,
+            'size' => $this->disk->size($path),
         ];
-    }
-
-    /**
-     * Return the mime type
-     *
-     * @param $path
-     * @return mixed|null|string
-     */
-    public function fileMimeType($path)
-    {
-        return $this->mimeDetect->findType(
-            pathinfo(strtolower($path), PATHINFO_EXTENSION)
-        );
-    }
-
-    /**
-     * Return the file size
-     *
-     * @param $path
-     * @return
-     */
-    public function fileSize($path)
-    {
-        return $this->disk->size($path);
     }
 
     /**
@@ -248,7 +256,7 @@ class UploadsManager
      * @param $path
      * @return Carbon
      */
-    public function fileModified($path)
+    public function fileModified($path): Carbon
     {
         return Carbon::createFromTimestamp(
             $this->disk->lastModified($path)
@@ -259,24 +267,26 @@ class UploadsManager
      * Create a new directory
      *
      * @param $folder
-     * @return string|\Symfony\Component\Translation\TranslatorInterface
+     * @param $path
+     * @return Application|array|bool|string|Translator|null
      */
-    public function createDirectory($folder)
+    public function createDirectory($folder, $path)
     {
-        $folder = $this->cleanFolder($folder);
+        $folder = Str::slug($this->cleanFolder($folder));
+        $path = $path . '/' . $folder;
 
-        if ($this->disk->exists($folder)) {
-            return trans('filemanager::filemanager.folder_exists', ['folder' => $folder]);
+        if ($this->disk->exists($path)) {
+            return trans('filemanager::filemanager.folder_exists', ['folder' => $path]);
         }
 
-        return $this->disk->makeDirectory($folder);
+        return $this->disk->makeDirectory($path);
     }
 
     /**
      * Delete a directory
      *
      * @param $folder
-     * @return string|\Symfony\Component\Translation\TranslatorInterface
+     * @return array|bool|Application|Translator|string|null
      */
     public function deleteDirectory($folder)
     {
@@ -297,7 +307,7 @@ class UploadsManager
      * Delete a file
      *
      * @param $path
-     * @return string|\Symfony\Component\Translation\TranslatorInterface
+     * @return Application|array|bool|string|Translator|null
      */
     public function deleteFile($path)
     {
@@ -315,7 +325,7 @@ class UploadsManager
      *
      * @param $path
      * @param $content
-     * @return string|\Symfony\Component\Translation\TranslatorInterface
+     * @return Application|array|bool|string|Translator|null
      */
     public function saveFile($path, $content)
     {
@@ -332,23 +342,30 @@ class UploadsManager
      * Resize file to create thumbnail.
      *
      * @access public
-     * @param  UploadedFile $uploadedFile
-     * @param  string $targetFilepath
-     * @param  int $width
-     * @param  int $height (default: null)
-     * @param  int $quality (default: null)
-     * @param  bool $squared (default: false)
+     * @param string $originalFilepath
+     * @param string $targetFilepath
+     * @param Uploads $upload
+     * @param array $transform
+     * @param string $transformHandle
      */
-    public function resizeCropImage($uploadedFile, $targetFilepath, $filename, $width, $height = null, $quality = null, $squared = false)
+    public function resizeCropImage(
+        string       $originalFile,
+        string       $targetFilepath,
+        Uploads      $upload,
+        array        $transform,
+        string       $transformHandle
+    )
     {
+        list($width, $height, $squared, $quality) = $transform;
+
         try {
             $quality = (!empty($quality) ? $quality : $this->quality);
-            $squared = (isset($squared) ? $squared : false);
+            $squared = $squared ?? false;
 
-            $image = $this->intervention->make($uploadedFile);
+            $image = $this->intervention->make($originalFile);
 
             if ($squared) {
-                $width = ($height < $width ? $height : $width);
+                $width = min($height, $width);
                 $height = $width;
 
                 $image->fit($width, $height, function ($image) {
@@ -360,16 +377,26 @@ class UploadsManager
                 });
             }
 
-            $tempFile = Str::finish($this->tempFolder, '/') . $filename;
+            $tempFile = Str::finish($this->tempFolder, '/') . $upload->filename;
 
             mkdir($this->tempFolder);
             $image->save($tempFile, $quality);
+            $this->saveTransformToDb($image, $transformHandle, $upload);
             $this->saveFile($targetFilepath, $image);
             $this->removeTemp();
 
         } catch (Exception $e) {
             throw new \Mockery\Exception($e->getMessage());
         }
+    }
+
+    private function saveTransformToDb($image, $transformHandle, $upload)
+    {
+        $transform = new Transforms();
+        $transform->transform = $transformHandle;
+        $transform->dimension = ['width' => $image->width(), 'height' => $image->height()];
+        $upload->transforms()->save($transform);
+        $upload->refresh();
     }
 
     /**

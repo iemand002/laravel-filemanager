@@ -5,6 +5,7 @@ return [
     'file_manager' => 'File manager',
     'uploads' => 'Uploads',
     'new_folder' => 'New Folder',
+    'delete_folder' => 'Delete Folder',
     'new_file' => 'New File',
     'upload' => 'Upload',
     'type' => 'Type',

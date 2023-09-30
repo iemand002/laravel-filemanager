@@ -9,16 +9,7 @@
         <link href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css" type="text/css"
               rel="stylesheet">
     @endif
-    <style>
-        .table > tbody > tr > td.checkbox-label, .table > thead > tr > th.checkbox-label {
-            padding: 0;
-        }
-        td.checkbox-label label, th.checkbox-label label {
-            padding: 8px;
-            margin: 0;
-            display: block;
-        }
-    </style>
+    <link href="{{ asset('vendor/iemand002/filemanager/css/filemanager.css') }}" rel="stylesheet" type="text/css">
 @endpush
 
 @section(config('filemanager.content_section'))
@@ -81,8 +72,36 @@
         </div>
 
         <div class="row">
-            <div class="col-sm-12">
-
+            <div class="col-sm-12 col-md-3">
+                <button class="btn btn-primary d-md-none" type="button" data-toggle="collapse" data-target="#collapseFolders" aria-expanded="false" aria-controls="collapseFolders">
+                    {{ trans('filemanager::filemanager.folders') }}
+                </button>
+                <div class="collapse" id="collapseFolders">
+                    <ul class="list-unstyled">
+                        {{-- The Subfolders --}}
+                        @php
+                            $noFolders = true;
+                        @endphp
+                        @foreach($data->value as $entry)
+                            @if(!property_exists($entry, 'file'))
+                            <li>
+                                @php
+                                    $link = route('filemanager.pickerCloud', ['onedrive']) . "?folder=" . ($foldersByName == '' ? $entry->name : $foldersByName . "/" . $entry->name) . "&folders=" . ($foldersUrl != '' ? $foldersUrl . '-' : '') . $entry->id . '&cloud=onedrive'. $urlParams;
+                                    $noFolders = false;
+                                @endphp
+                                <a href="{{$link}}">
+                                    {{ $entry->name }}
+                                </a>
+                            </li>
+                            @endif
+                        @endforeach
+                        @if($noFolders)
+                            <li>{{ trans('filemanager::filemanager.no_folders') }}</li>
+                        @endif
+                    </ul>
+                </div>
+            </div>
+                <div class="col-sm-12 col-md-9">
                 <div class="table-responsive">
                     <table id="uploads-table" class="table table-striped table-bordered">
                         <thead>
@@ -150,31 +169,13 @@
                                         @endif
                                     </td>
                                 </tr>
-                            @else
-                                <tr>
-                                    @if(isset($_GET['multi']))
-                                        <td>&nbsp;</td>
-                                    @endif
-                                    <td>
-                                        @php
-                                            $link = route('filemanager.pickerCloud', ['onedrive']) . "?folder=" . ($foldersByName == '' ? $entry->name : $foldersByName . "/" . $entry->name) . "&folders=" . ($foldersUrl != '' ? $foldersUrl . '-' : '') . $entry->id . '&cloud=onedrive'. $urlParams;
-                                        @endphp
-                                        <a href="{{$link}}">
-                                            <i class="fa fa-folder"></i>
-                                            {{ $entry->name }}
-                                        </a>
-                                    </td>
-                                        <td>{{ trans('filemanager::filemanager.folder') }}</td>
-                                        <td>-</td>
-                                        <td>-</td>
-                                        <td>-</td>
-                                </tr>
                             @endif
                         @endforeach
 
 
                         </tbody>
                     </table>
+                </div>
                 </div>
             </div>
         </div>

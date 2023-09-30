@@ -1,41 +1,43 @@
 {
-    "name": "iemand002/filemanager",
-    "description": "Multi language file manager package",
-    "keywords": [
-        "laravel"
-    ],
-    "authors": [
-        {
-            "name": "Ruud Lamers",
-            "email": "ruud.lamers@live.nl"
-        }
-    ],
-    "require": {
-        "php" : "^7.3.0",
-        "illuminate/config": "8.*",
-        "illuminate/database": "8.*",
-        "illuminate/support": "8.*",
-        "intervention/image": "^2.4",
-        "dflydev/apache-mime-types": "^1.0",
-        "nesbot/carbon": "^2.0"
-    },
-    "suggest": {
-        "socialiteproviders/dropbox": "For Dropbox login and unlocking the integration in de file picker",
-        "socialiteproviders/microsoft-graph": "For Microsoft login and unlocking the OneDrive integration in the file picker"
-    },
-    "autoload": {
-        "psr-4": {
-            "Iemand002\\Filemanager\\": "src/Filemanager"
-        }
-    },
-    "extra": {
-        "laravel": {
-            "providers": [
-                "Iemand002\\Filemanager\\FilemanagerServiceProvider"
-            ],
-            "aliases": {
-                "Filemanager": "Iemand002\\Filemanager\\FilemanagerFacade"
-            }
-        }
+  "name": "iemand002/filemanager",
+  "description": "Multi language file manager package",
+  "keywords": [
+    "laravel"
+  ],
+  "authors": [
+    {
+      "name": "Ruud Lamers",
+      "email": "ruud.lamers@live.nl"
     }
+  ],
+  "require": {
+    "php": "^7.3.0",
+    "illuminate/config": "8.*",
+    "illuminate/database": "8.*",
+    "illuminate/support": "8.*",
+    "intervention/image": "^2.4",
+    "dflydev/apache-mime-types": "^1.0",
+    "nesbot/carbon": "^2.0",
+    "ext-exif": "*",
+    "ext-json": "*"
+  },
+  "suggest": {
+    "socialiteproviders/dropbox": "For Dropbox login and unlocking the integration in de file picker",
+    "socialiteproviders/microsoft-graph": "For Microsoft login and unlocking the OneDrive integration in the file picker"
+  },
+  "autoload": {
+    "psr-4": {
+      "Iemand002\\Filemanager\\": "src/Filemanager"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Iemand002\\Filemanager\\FilemanagerServiceProvider"
+      ],
+      "aliases": {
+        "Filemanager": "Iemand002\\Filemanager\\FilemanagerFacade"
+      }
+    }
+  }
 }

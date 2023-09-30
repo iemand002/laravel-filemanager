@@ -5,8 +5,11 @@ namespace Iemand002\Filemanager;
 use Dflydev\ApacheMimeTypes\PhpRepository;
 use Iemand002\Filemanager\models\Uploads;
 use Iemand002\Filemanager\Traits\DropboxHelperTrait;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Intervention\Image\Image;
 use Intervention\Image\ImageManager;
 
 class FilemanagerBuilder
@@ -26,15 +29,11 @@ class FilemanagerBuilder
     }
 
     /**
-     * Get the url of a uploaded file
-     *
-     * @param $id
-     * @param null $transformHandle
-     * @return \Illuminate\Contracts\Routing\UrlGenerator|null|string
+     * @throws FileNotFoundException
      */
-    public function getUrl($id, $transformHandle = null)
+    public function getFile($id, $transformHandle = null)
     {
-        $upload = Uploads::find($id);
+        $upload = Uploads::with('transforms')->find($id);
 
         if ($upload == null) {
             return null;
@@ -51,28 +50,46 @@ class FilemanagerBuilder
             }
         }
 
-        if (is_image($upload->mimeType) && $transformHandle != null) {
-            $transforms = config('filemanager.transforms');
-            $transform = $transforms[$transformHandle];
-
-            if (empty($transform) || !is_array($transform)) {
-                return null;
+        if (is_image($upload->mimeType)) {
+            if ($transformHandle != null) {
+                return json_decode($this->getImage($upload, $transformHandle));
             }
 
-            $path = $this->makeTransform($transformHandle, $folder, $upload, $transform);
+            $upload->width = $upload->dimension->width;
+            $upload->height = $upload->dimension->height;
         }
 
-        return $this->disk->url($path);
+        $upload->url = $this->disk->url($path);
+        return $upload;
     }
 
-    public function getWidth($id, $transformHandle = null)
+    /**
+     * Get the url of an uploaded file
+     *
+     * @param $id
+     * @param null $transformHandle
+     * @return string|null
+     * @throws FileNotFoundException
+     */
+    public function getUrl($id, $transformHandle = null): ?string
     {
-        return $this->getImage($id, $transformHandle) ? $this->getImage($id, $transformHandle)->width() : 0;
+        return $this->getFile($id, $transformHandle)->url ?? null;
     }
 
-    public function getHeight($id, $transformHandle = null)
+    /**
+     * @throws FileNotFoundException
+     */
+    public function getWidth($id, $transformHandle = null): int
     {
-        return $this->getImage($id, $transformHandle) ? $this->getImage($id, $transformHandle)->height() : 0;
+        return $this->getFile($id, $transformHandle)->width ?? 0;
+    }
+
+    /**
+     * @throws FileNotFoundException
+     */
+    public function getHeight($id, $transformHandle = null): int
+    {
+        return $this->getFile($id, $transformHandle)->height ?? 0;
     }
 
     /**
@@ -80,38 +97,42 @@ class FilemanagerBuilder
      * @param $folder
      * @param $upload
      * @param $transform
+     * @return string
+     * @throws FileNotFoundException
      */
-    private function makeTransform($transformHandle, $folder, $upload, $transform)
+    private function makeTransform($transformHandle, $folder, $upload, $transform): string
     {
         $transformFolder = Str::finish($folder . '_' . $transformHandle, '/');
         $path = $transformFolder . $upload->filename;
+        $transformImage = $upload->transforms->keyBy('transform')[$transformHandle] ?? null;
 
-        if (!$this->disk->exists($path)) {
+        if (!$transformImage) {
             $originalPath = $folder . $upload->filename;
-            list($width, $height, $squared, $quality) = $transform;
 
             if (!$this->disk->exists($transformFolder)) {
                 $this->disk->makeDirectory($transformFolder);
             }
 
-            $this->manager->resizeCropImage($this->disk->get($originalPath), $path, $upload->filename, $width, $height, $quality, $squared);
+            $this->manager->resizeCropImage($this->disk->get($originalPath), $path, $upload, $transform, $transformHandle);
+            $transformImage = $upload->transforms->keyBy('transform')[$transformHandle] ?? null;
+
         }
-        return $path;
+
+        $transformImage->filename = $upload->filename;
+        $transformImage->url = $this->disk->url($path);
+        $transformImage->width = $transformImage->dimension->width;
+        $transformImage->height = $transformImage->dimension->height;
+        return $transformImage;
     }
 
     /**
-     * @param $id
+     * @param $upload
      * @param null $transformHandle
-     * @return \Intervention\Image\Image|null
+     * @return string|null
+     * @throws FileNotFoundException
      */
-    private function getImage($id, $transformHandle = null)
+    private function getImage($upload, $transformHandle = null): ?string
     {
-        $upload = Uploads::find($id);
-
-        if ($upload == null || !is_image($upload->mimeType)) {
-            return null;
-        }
-
         if ($transformHandle != null) {
             $transforms = config('filemanager.transforms');
             $transform = $transforms[$transformHandle];
@@ -134,13 +155,12 @@ class FilemanagerBuilder
         }
 
         $folder = Str::finish($upload->folder, '/');
-        $path = $folder . $upload->filename;
 
         if ($transformHandle != null) {
-            $path = $this->makeTransform($transformHandle, $folder, $upload, $transform);
+            return $this->makeTransform($transformHandle, $folder, $upload, $transform);
         }
 
-        return $this->intervention->make($this->disk->get($path));
+        return $upload;
     }
 
     /**
@@ -152,7 +172,7 @@ class FilemanagerBuilder
      * @param $height
      * @return array
      */
-    private function resize_dimensions($goal_width, $goal_height, $width, $height)
+    private function resize_dimensions($goal_width, $goal_height, $width, $height): array
     {
         $return = array('width' => $width, 'height' => $height);
 

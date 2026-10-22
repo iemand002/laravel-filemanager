@@ -3,12 +3,16 @@
 namespace Iemand002\Filemanager\models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Uploads extends Model
 {
     protected $table;
     public $timestamps = true;
-    protected $casts = ['dimension' => 'object'];
+    protected $casts = [
+        'dimension' => 'object',
+        'time_taken' => 'datetime'
+    ];
 
     /**
      * Uploads constructor.
@@ -20,11 +24,18 @@ class Uploads extends Model
         parent::__construct($attributes);
     }
 
-    public function scopeWidth(){
+    public function scopeWidth()
+    {
         return $this->dimension->width ?? 0;
     }
 
-    public function scopeHeight(){
+    public function scopeHeight()
+    {
         return $this->dimension->height ?? 0;
+    }
+
+    public function transforms(): HasMany
+    {
+        return $this->hasMany('Iemand002\Filemanager\models\Transforms', 'upload_id');
     }
 }

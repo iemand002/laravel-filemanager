@@ -5,20 +5,21 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Schema;
 
-class CreateSocialLoginsTable extends Migration {
+return new class extends Migration
+{
 
     protected $table;
 
     public function __construct()
     {
         $this->table = config('filemanager.social_table', 'social_logins');
-        $this->usersTable = config('filemanager.users_table','users');
+        $this->usersTable = config('filemanager.users_table', 'users');
     }
 
-	public function up()
-	{
-	    if (! Schema::hasTable($this->table)) {
-            Schema::create($this->table, function(Blueprint $table) {
+    public function up()
+    {
+        if (!Schema::hasTable($this->table)) {
+            Schema::create($this->table, function (Blueprint $table) {
                 if (Config::get('filemanager.use_bigInteger', true)) {
                     $table->bigIncrements('id');
                 } else {
@@ -36,7 +37,7 @@ class CreateSocialLoginsTable extends Migration {
                 $table->text('refresh')->nullable();
                 $table->timestamps();
             });
-            Schema::table($this->table, function(Blueprint $table) {
+            Schema::table($this->table, function (Blueprint $table) {
                 $table->foreign('user_id')->references('id')->on($this->usersTable)
                     ->onDelete('restrict')
                     ->onUpdate('restrict');
@@ -44,13 +45,13 @@ class CreateSocialLoginsTable extends Migration {
         }
     }
 
-	public function down()
-	{
+    public function down()
+    {
         if (Schema::hasTable($this->table)) {
-            Schema::table($this->table, function(Blueprint $table) {
+            Schema::table($this->table, function (Blueprint $table) {
                 $table->dropForeign($this->table . '_user_id_foreign');
             });
             Schema::drop($this->table);
         }
-	}
-}
+    }
+};

@@ -54,16 +54,229 @@
     </div>
 @endsection
 
+@push(config('filemanager.css_section'))
+    <link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/44.3.0/ckeditor5.css" crossorigin>
+@endpush
 @push(config('filemanager.javascript_section'))
-    <script src="//cdn.ckeditor.com/4.14.1/standard/ckeditor.js"></script>
+    <script src="https://cdn.ckeditor.com/ckeditor5/48.3.0/ckeditor5.umd.js" crossorigin></script>
     <script>
-        $(function () {
-            CKEDITOR.replace('body', {
-                // customConfig: '/js/ckeditor/config.js',
-                filebrowserImageBrowseUrl: '{{route('filemanager.picker')}}',
-                filebrowserBrowseUrl: '{{route('filemanager.picker')}}',
+      // 1. Functie om uw eigen file picker te openen en afbeelding in te voegen
+      function openMijnCustomFilePicker(editor) {
+        // Vervang dit prompt-voorbeeld door uw eigen modal of window.open()
+
+        window.ckeditorCallback = function(fileUrl) {
+          editor.model.change(writer => {
+            const imageElement = writer.createElement('imageBlock', { src: fileUrl });
+            editor.model.insertContent(imageElement, editor.model.document.selection);
+          });
+        };
+        window.open('{{route('filemanager.picker')}}?CKEditor=true','imagepicker', 'width=1000,height=500,scrollbars=yes,toolbar=no,location=no');
+      }
+
+      /**
+       * This configuration was generated using the CKEditor 5 Builder. You can modify it anytime using this link:
+       * https://ckeditor.com/ckeditor-5/builder/?redirect=portal#installation/NoNgNARAzAdAjDATBSc4gJyIAxytjADhABYB2DDE8gVkShDOxoyhpG2xO0YLRLj0OIHNhQQApgDsU2MMDhg5cxSoC6kEITI0acGhDVA=
+       */
+
+      const {
+        ClassicEditor,
+        Autosave,
+        Essentials,
+        Paragraph,
+        Autoformat,
+        TextTransformation,
+        LinkImage,
+        Link,
+        ImageBlock,
+        ImageToolbar,
+        ButtonView,
+        BlockQuote,
+        Bold,
+        ImageInsertViaUrl,
+        AutoImage,
+        Table,
+        TableToolbar,
+        Heading,
+        ImageTextAlternative,
+        ImageCaption,
+        ImageStyle,
+        Indent,
+        IndentBlock,
+        ImageInline,
+        Italic,
+        List,
+        MediaEmbed,
+        MediaEmbedStyle,
+        MediaEmbedToolbar,
+        TodoList,
+        Underline,
+        Strikethrough,
+        Subscript,
+        Superscript,
+        Alignment
+      } = window.CKEDITOR;
+
+      /**
+       * This is a 24-hour evaluation key. Create a free account to use CDN: https://portal.ckeditor.com/checkout?plan=free
+       */
+      const LICENSE_KEY =
+        'eyJhbGciOiJFUzI1NiJ9.eyJleHAiOjE3ODM5MDA3OTksImp0aSI6IjhhM2Y2ZGYzLWQzNzktNDUxMS1hMTZkLTVhMzFlNDc4YzRhYiIsImxpY2Vuc2VkSG9zdHMiOlsiKi53ZWJjb250YWluZXIuaW8iLCIqLmpzaGVsbC5uZXQiLCIqLmNzcC5hcHAiLCJjZHBuLmlvIiwiMTI3LjAuMC4xIiwibG9jYWxob3N0IiwiMTkyLjE2OC4qLioiLCIxMC4qLiouKiIsIjE3Mi4qLiouKiIsIioudGVzdCIsIioubG9jYWxob3N0IiwiKi5sb2NhbCJdLCJkaXN0cmlidXRpb25DaGFubmVsIjpbImNsb3VkIiwiZHJ1cGFsIiwic2giXSwibGljZW5zZVR5cGUiOiJldmFsdWF0aW9uIiwidmMiOiJhOTMzYTUzNiJ9.14i6YlGHpkpoOQcRxAYmKov2WGimMA5zv-JR6gJAAT8RUlLkXAvgTQ2DHDldeqmhLEseY09jpV593mhAFYBmVA';
+
+      const editorConfig = {
+        attachTo: document.querySelector('#editor'),
+        root: {
+          placeholder: 'Type or paste your content here!',
+          initialData:
+            '<h2>Evaluation license key 🔑</h2>\n<p>\n\tAn evaluation key is being used in this editor. <a href="https://portal.ckeditor.com/checkout?plan=free">\n\t\tCreate an account to use your own license keys.\n\t</a>\n</p>\n\n<h2>Congratulations on setting up CKEditor 5! 🎉</h2>\n<p>\n\tYou\'ve successfully created a CKEditor 5 project. This powerful text editor\n\twill enhance your application, enabling rich text editing capabilities that\n\tare customizable and easy to use.\n</p>\n<h3>What\'s next?</h3>\n<ol>\n\t<li>\n\t\t<strong>Integrate into your app</strong>: time to bring the editing into\n\t\tyour application. Take the code you created and add to your application.\n\t</li>\n\t<li>\n\t\t<strong>Explore features:</strong> Experiment with different plugins and\n\t\ttoolbar options to discover what works best for your needs.\n\t</li>\n\t<li>\n\t\t<strong>Customize your editor:</strong> Tailor the editor\'s\n\t\tconfiguration to match your application\'s style and requirements. Or\n\t\teven write your plugin!\n\t</li>\n</ol>\n<p>\n\tKeep experimenting, and don\'t hesitate to push the boundaries of what you\n\tcan achieve with CKEditor 5. Your feedback is invaluable to us as we strive\n\tto improve and evolve. Happy editing!\n</p>\n<h3>Helpful resources</h3>\n<ul>\n\t<li>📝 <a href="https://portal.ckeditor.com/checkout?plan=free">Trial sign up</a>,</li>\n\t<li>📕 <a href="https://ckeditor.com/docs/ckeditor5/latest/installation/index.html">Documentation</a>,</li>\n\t<li>⭐️ <a href="https://github.com/ckeditor/ckeditor5">GitHub</a> (star us if you can!),</li>\n\t<li>🏠 <a href="https://ckeditor.com">CKEditor Homepage</a>,</li>\n\t<li>🧑‍💻 <a href="https://ckeditor.com/ckeditor-5/demo/">CKEditor 5 Demos</a>,</li>\n</ul>\n<h3>Need help?</h3>\n<p>\n\tSee this text, but the editor is not starting up? Check the browser\'s\n\tconsole for clues and guidance. It may be related to an incorrect license\n\tkey if you use premium features or another feature-related requirement. If\n\tyou cannot make it work, file a GitHub issue, and we will help as soon as\n\tpossible!\n</p>\n'
+        },
+        toolbar: {
+          items: [
+            'undo',
+            'redo',
+            '|',
+            'heading',
+            '|',
+            'bold',
+            'italic',
+            'underline',
+            'strikethrough',
+            'subscript',
+            'superscript',
+            '|',
+            'link',
+            'insertImageViaUrl',
+            'mediaEmbed',
+            'insertTable',
+            'blockQuote',
+            '|',
+            'alignment',
+            '|',
+            'bulletedList',
+            'numberedList',
+            'todoList',
+            'outdent',
+            'indent',
+            'mijnCustomBrowserKnop'
+          ],
+          shouldNotGroupWhenFull: false
+        },
+        plugins: [
+          Alignment,
+          Autoformat,
+          AutoImage,
+          Autosave,
+          BlockQuote,
+          Bold,
+          Essentials,
+          Heading,
+          ImageBlock,
+          ImageCaption,
+          ImageInline,
+          ImageInsertViaUrl,
+          ImageStyle,
+          ImageTextAlternative,
+          ImageToolbar,
+          Indent,
+          IndentBlock,
+          Italic,
+          Link,
+          LinkImage,
+          List,
+          MediaEmbed,
+          MediaEmbedStyle,
+          MediaEmbedToolbar,
+          Paragraph,
+          Strikethrough,
+          Subscript,
+          Superscript,
+          Table,
+          TableToolbar,
+          TextTransformation,
+          TodoList,
+          Underline,
+          function CustomFilePickerPlugin(editor) {
+            editor.ui.componentFactory.add('mijnCustomBrowserKnop', locale => {
+              const view = new ButtonView(locale);
+              view.set({ label: 'Media bibliotheek', withText: true });
+              view.on('execute', () => openMijnCustomFilePicker(editor));
+              return view;
             });
-        });
+          }
+        ],
+        licenseKey: LICENSE_KEY,
+        autosave: {
+          /* See: https://ckeditor.com/docs/ckeditor5/latest/features/autosave.html */
+        },
+        heading: {
+          options: [
+            {
+              model: 'paragraph',
+              title: 'Paragraph',
+              class: 'ck-heading_paragraph'
+            },
+            {
+              model: 'heading1',
+              view: 'h1',
+              title: 'Heading 1',
+              class: 'ck-heading_heading1'
+            },
+            {
+              model: 'heading2',
+              view: 'h2',
+              title: 'Heading 2',
+              class: 'ck-heading_heading2'
+            },
+            {
+              model: 'heading3',
+              view: 'h3',
+              title: 'Heading 3',
+              class: 'ck-heading_heading3'
+            },
+            {
+              model: 'heading4',
+              view: 'h4',
+              title: 'Heading 4',
+              class: 'ck-heading_heading4'
+            },
+            {
+              model: 'heading5',
+              view: 'h5',
+              title: 'Heading 5',
+              class: 'ck-heading_heading5'
+            },
+            {
+              model: 'heading6',
+              view: 'h6',
+              title: 'Heading 6',
+              class: 'ck-heading_heading6'
+            }
+          ]
+        },
+        image: {
+          toolbar: ['toggleImageCaption', 'imageTextAlternative', '|', 'imageStyle:inline', 'imageStyle:wrapText', 'imageStyle:breakText']
+        },
+        link: {
+          addTargetToExternalLinks: true,
+          defaultProtocol: 'https://',
+          decorators: {
+            toggleDownloadable: {
+              mode: 'manual',
+              label: 'Downloadable',
+              attributes: {
+                download: 'file'
+              }
+            }
+          }
+        },
+        mediaEmbed: {
+          toolbar: ['mediaEmbed:breakText', 'mediaEmbed:wrapText']
+        },
+        table: {
+          contentToolbar: ['tableColumn', 'tableRow', 'mergeTableCells']
+        }
+      };
+
+      ClassicEditor.create(document.querySelector('#body'), editorConfig);
     </script>
     <script>
         // Listen to localstorage change

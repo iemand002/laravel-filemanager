@@ -5,7 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Schema;
 
-class CreateImageUploadTable extends Migration
+return new class extends Migration
 {
     protected $table;
 
@@ -45,4 +45,4 @@ class CreateImageUploadTable extends Migration
             Schema::drop($this->table);
         }
     }
-}
+};

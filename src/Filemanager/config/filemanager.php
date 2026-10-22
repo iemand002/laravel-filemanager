@@ -9,6 +9,7 @@ return [
     // Table
     'use_bigInteger' => true,
     'table' => 'uploads', // Table to store the uploads
+    'transforms_table' => 'uploads_transforms', // Table to store the transforms
     'social_table' => 'social_logins', // Table to store the social logins
     'users_table' => 'users', // Table where the users are stored, usually this is the default 'users'
 
@@ -74,7 +75,7 @@ return [
      * Default transform for cloud images.
      *
      * array(width, height, squared, quality)
-     * Due to the Dropbox API this are the options:
+     * Due to the Dropbox API these are the options:
      *
      * [32, 32, true, null]
      * [64, 64, true, null]

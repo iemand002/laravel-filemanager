@@ -1,6 +1,6 @@
 @if(config('filemanager.jquery_datatables.use') && config('filemanager.jquery_datatables.cdn'))
-    <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.10.21/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/2.2.2/js/dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/2.2.2/js/dataTables.bootstrap5.js"></script>
 @endif
 <script>
 
@@ -86,16 +86,9 @@
         }
 
         function callCkeditor(data) {
-            // use CKEditor 3.0 + integration method
             var url = data.webPath + data.folder + data.files[0].fileName;
-            if (window.opener) {
-                // Popup
-                window.opener.CKEDITOR.tools.callFunction(getUrlParam('CKEditorFuncNum'), url);
-            } else {
-                // Modal (in iframe)
-                parent.CKEDITOR.tools.callFunction(getUrlParam('CKEditorFuncNum'), url);
-                parent.CKEDITOR.tools.callFunction(getUrlParam('CKEditorCleanUpFuncNum'));
-
+            if (window.opener && typeof window.opener.ckeditorCallback === 'function') {
+                window.opener.ckeditorCallback(url);
             }
             window.close();
         }
@@ -104,7 +97,7 @@
             $('a.file').click(function (e) {
                 // single add
                 e.preventDefault();
-                data.type = 'single';
+                data.type = getUrlParam('CKEditor') ? 'CKEditor' : 'single';
                 data.files = [$(this).data()];
                 saveSocial(data);
             });
@@ -143,26 +136,124 @@
             window.close();
         }
 
-        @if(config('filemanager.jquery_datatables.use'))
-            // init data tables plugin
-            $("#uploads-table").DataTable({
-                @if(config('app.locale') == 'nl')
-                // Load translations
-                "language": {
-                    "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Dutch.json"
-                },
-                @endif
-                @if(isset($_GET['multi']))
-                // Change default order column
-                "order": [[1, 'asc']]
-                @endif
-            }).on('draw', function(){
-                initFileClick();
-                initMultiFile();
+        function initActionButtons() {
+            $(".btn-delete").each(function (){
+                $(this).click(function (e) {
+                    e.preventDefault();
+                    var name = $(this).data('name');
+                    $("#delete-file-name1").html(name);
+                    $("#delete-file-name2").val(name);
+                    $("#modal-file-delete").modal("show");
+                });
             });
-        @else
+            $(".btn-image").each(function(){
+                $(this).click(function (e) {
+                    e.preventDefault();
+                    var path = $(this).data('path')
+                    $("#preview-image").attr("src", path);
+                    $("#modal-image-view").modal("show");
+                });
+            });
+        }
+
+
+        // init data tables plugin
+        new DataTable("#uploads-table", {
+            "autoWidth": false,
+            @if(config('app.locale') == 'nl')
+            // Load translations
+            "language": {
+                "url": "https://cdn.datatables.net/plug-ins/2.2.2/i18n/nl-NL.json"
+            },
+            @endif
+            @if(isset($_GET['multi']))
+            // Change default order column
+            "order": [[1, 'asc']],
+            @endif
+            @if(!isset($_GET['cloud']))
+            "ajax": "{{ route('filemanager.ajax') }}?folder=" + data.folder,
+            columns: [
+                    @if(isset($_GET['multi']))
+                {
+                    class: 'checkbox-label',
+                    data: 'multi',
+                    render: function (data, type, row, meta) {
+                        if (type === 'display') {
+                            var html = '<label for="check' + data.id + '">';
+                            html += '<input type="checkbox" name="files[]" id="check' + data.id + '" \
+                            data-file-id="' + data.id + '" data-file-name="' + data.name + '">';
+                                html += '<span class="sr-only">{{ trans('filemanager::filemanager.check') }}</span>';
+                            html += '</label>';
+                            return html;
+                        }
+                        return data;
+                    }
+                },
+                    @endif
+                {
+                    data: 'link',
+                    render: function (data, type, row, meta) {
+                        if (type === 'display') {
+                            var html = '<a class="file" href="#" data-file-id="' + data.id + '" \
+                                          data-file-name="' + data.name + '">' +
+                                (data.isImage ? '<i class="far fa-file-image"></i> ' :
+                                '<i class="far fa-file-alt"></i> ')
+                                + data.name +
+                            '</a>';
+                            return html;
+                        }
+                        return data.name;
+                    },
+                    width: '50%',
+                },
+                { data: 'type' },
+                {
+                    data: 'modified',
+                    render: function (data, type, row, meta) {
+                        if (type === 'display') {
+                            return data.display;
+                        }
+                        if (type === 'sort') {
+                            return data.sort;
+                        }
+                        return data;
+                    },
+                    width: '100px'
+                },
+                { data: 'size' },
+                { data: 'buttons',
+                    render: function (data, type, row, meta) {
+                        if (type === 'display') {
+                            var html = '<button type="button" class="btn btn-sm btn-danger btn-delete"' +
+                                'data-name="' + data.name + '" data-toggle="tooltip" ' +
+                                'title="{{ trans('filemanager::filemanager.delete') }}">' +
+                                '<i class="fa fa-times-circle"></i>' +
+                            '</button>';
+                            if (data.isImage) {
+                                html += '<button type="button" class="btn btn-sm btn-success btn-image"' +
+                                    'data-path="' + data.webPath + '" data-toggle="tooltip" ' +
+                                    'title="{{ trans('filemanager::filemanager.preview') }}">' +
+                                    '<i class="fa fa-eye"></i>' +
+                                    '</button>';
+                            }
+                            return html;
+                        }
+                        return data;
+                    }
+                }
+            ],
+            @else
+            "columnDefs": [
+                { "width": "50%", "targets": getUrlParam('multi') ? 1 : 0 },
+                { "width": "100px", "targets": getUrlParam('multi') ? 2 : 1 },
+            ],
+            @endif
+        }).on('draw', function(){
             initFileClick();
-            initMultiFile();
-        @endif
+            if (getUrlParam('multi')) {
+                initMultiFile();
+            }
+            initActionButtons();
+        });
     })
 </script>

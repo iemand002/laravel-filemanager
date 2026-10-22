@@ -17,7 +17,9 @@
         "illuminate/support": "9.*",
         "intervention/image": "^2.4",
         "dflydev/apache-mime-types": "^1.0",
-        "nesbot/carbon": "^2.0"
+        "nesbot/carbon": "^2.0",
+        "ext-exif": "*",
+        "ext-json": "*"
     },
     "suggest": {
         "socialiteproviders/dropbox": "For Dropbox login and unlocking the integration in de file picker",

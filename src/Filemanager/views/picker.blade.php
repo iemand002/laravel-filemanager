@@ -5,28 +5,16 @@
 @endsection
 
 @push(config('filemanager.css_section'))
-    @if(config('filemanager.jquery_datatables.use') && config('filemanager.jquery_datatables.cdn'))
-        <link href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css" type="text/css"
+    @if(config('filemanager.jquery_datatables.cdn'))
+        <link href="https://cdn.datatables.net/2.2.2/css/dataTables.bootstrap5.css" type="text/css"
               rel="stylesheet">
     @endif
-    <style>
-        .table > tbody > tr > td.checkbox-label, .table > thead > tr > th.checkbox-label {
-            padding: 0;
-        }
-        td.checkbox-label label, th.checkbox-label label {
-            padding: 8px;
-            margin: 0;
-            display: block;
-        }
-    </style>
+    <link href="{{ asset('vendor/iemand002/filemanager/css/filemanager.css') }}" rel="stylesheet" type="text/css">
 @endpush
 
 @section(config('filemanager.content_section'))
     @php
         $urlParams = '';
-        if (isset($_GET['CKEditor'])) {
-            $urlParams .= "&CKEditor=" . $_GET['CKEditor'] . "&CKEditorFuncNum=" . $_GET['CKEditorFuncNum'];
-        }
         if (isset($_GET['id'])) {
             $urlParams .= "&id=" . $_GET['id'];
         }
@@ -49,9 +37,23 @@
                             @php
                                 $link = route('filemanager.picker') . "?folder=" . $path . $urlParams;
                             @endphp
-                            <li class="breadcrumb-item"><a href="{{ $link }}">@if($disp == 'root')<i class="fas fa-home"></i>@else{{ $disp }}@endif</a></li>
+                            <li class="breadcrumb-item">
+                                <a href="{{ $link }}">
+                                    @if($disp == 'root')
+                                        <i class="fas fa-home"></i>
+                                    @else
+                                        {{ Str::headline($disp) }}
+                                    @endif
+                                </a>
+                            </li>
                         @endforeach
-                        <li class="breadcrumb-item active" aria-current="page">@if($folderName == 'root')<i class="fas fa-home"></i>@else{{ $folderName }}@endif</li>
+                        <li class="breadcrumb-item active" aria-current="page">
+                            @if($folderName == 'root')
+                                <i class="fas fa-home"></i>
+                            @else
+                                {{ Str::headline($folderName) }}
+                            @endif
+                        </li>
                     </ol>
                 </nav>
             </div>
@@ -61,12 +63,8 @@
                         <i class="fa fa-check-square"></i> {{ trans('filemanager::filemanager.select') }}
                     </button>
                 @endif
-                <button type="button" class="btn btn-success btn-md"
-                        data-toggle="modal" data-target="#modal-folder-create">
-                    <i class="fa fa-plus-circle"></i> {{ trans('filemanager::filemanager.new_folder') }}
-                </button>
                 <button type="button" class="btn btn-primary btn-md"
-                        data-toggle="modal" data-target="#modal-file-upload">
+                        data-bs-toggle="modal" data-bs-target="#modal-file-upload">
                     <i class="fa fa-upload"></i> {{ trans('filemanager::filemanager.upload') }}
                 </button>
                 @if(is_dropbox_configured() && !is_dropbox_loggedIn())
@@ -85,12 +83,68 @@
         </div>
 
         <div class="row">
-            <div class="col-sm-12">
+            <div class="col-sm-12 col-md-3">
+                <button class="btn btn-primary d-md-none" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#collapseFolders" aria-expanded="false" aria-controls="collapseFolders">
+                    {{ trans('filemanager::filemanager.folders') }}
+                </button>
+                <div class="collapse" id="collapseFolders">
+                    <ul class="list-unstyled">
+                        @if($folderName == 'root')
+                            @if(is_dropbox_loggedIn())
+                                <li>
+                                    @php
+                                        $link = route('filemanager.pickerCloud',["dropbox",""]) . "?folder=" . $urlParams . "&cloud=dropbox";
+                                    @endphp
+                                    <a href="{{ $link }}" class="folder folder-dropbox">
+                                        Dropbox ({{ trans('filemanager::filemanager.cloud') }})
+                                    </a>
+                                </li>
+                            @endif
+
+                            @if(is_onedrive_loggedIn())
+                                <li>
+                                    @php
+                                        $link = route('filemanager.pickerCloud',["onedrive",""]) . "?folder=" . $urlParams . "&cloud=onedrive";
+                                    @endphp
+                                    <a href="{{ $link }}" class="folder folder-windows">
+                                        OneDrive ({{ trans('filemanager::filemanager.cloud') }})
+                                    </a>
+                                </li>
+                            @endif
+                        @endif
+                        {{-- The Subfolders --}}
+                        @forelse ($subFolders as $path => $name)
+                            <li>
+                                @php
+                                    $link = route('filemanager.picker') . "?folder=" . $path . $urlParams;
+                                @endphp
+                                <a href="{{ $link }}" class="folder">
+                                    {{ Str::headline($name) }}
+                                </a>
+                            </li>
+                        @empty
+                            <li>{{ trans('filemanager::filemanager.no_folders') }}</li>
+                        @endforelse
+                    </ul>
+                    <button type="button" class="btn btn-success btn-sm"
+                            data-bs-toggle="modal" data-bs-target="#modal-folder-create">
+                        <i class="fa fa-plus-circle"></i> {{ trans('filemanager::filemanager.new_folder') }}
+                    </button>
+                    <button type="button" class="btn btn-sm btn-danger"
+                            data-bs-toggle="modal" data-bs-target="#modal-folder-delete"
+                            data-folder="{{ $folderName }}">
+                        <i class="fa fa-times-circle"></i>
+                        {{ trans('filemanager::filemanager.delete') }}
+                    </button>
+                </div>
+            </div>
+            <div class="col-sm-12 col-md-9">
 
                 @if(config('filemanager.alert_messages.picker'))
                     @if(Session::has('success'))
                         <div class="alert alert-success">
-                            <button type="button" class="close" data-dismiss="alert">×</button>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                             <strong>
                                 <i class="fa fa-check-circle"></i> {{ trans('filemanager::filemanager.success') }}
                             </strong>
@@ -99,7 +153,7 @@
                     @endif
                     @if($errors->any())
                         <div class="alert alert-danger">
-                            <button type="button" class="close" data-dismiss="alert">×</button>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                             <strong>{{ trans('filemanager::filemanager.whoops') }}</strong>
                             <ul class="list">
                                 @foreach($errors->all() as $error)
@@ -130,119 +184,57 @@
                         </tr>
                         </thead>
                         <tbody>
-
-                        @if(is_dropbox_loggedIn())
-                            <tr>
-                                @if(isset($_GET['multi']))
-                                    <td>&nbsp;</td>
-                                @endif
-                                <td>
-                                    @php
-                                        $link = route('filemanager.pickerCloud',["dropbox",""]) . "?folder=" . $urlParams . '&cloud=dropbox';
-                                    @endphp
-                                    <a href="{{ $link }}">
-                                        <i class="fab fa-dropbox"></i>
-                                        Dropbox
-                                    </a>
-                                </td>
-                                <td>{{ trans('filemanager::filemanager.cloud') }}</td>
-                                <td>-</td>
-                                <td>-</td>
-                                <td>-</td>
-                            </tr>
-                        @endif
-
-                        @if(is_onedrive_loggedIn())
-                            <tr>
-                                @if(isset($_GET['multi']))
-                                    <td>&nbsp;</td>
-                                @endif
-                                <td>
-                                    @php
-                                        $link = route('filemanager.pickerCloud',["onedrive",""]) . "?folder=" . $urlParams . '&cloud=onedrive';
-                                    @endphp
-                                    <a href="{{ $link }}">
-                                        <i class="fab fa-windows"></i>
-                                        OneDrive
-                                    </a>
-                                </td>
-                                <td>{{ trans('filemanager::filemanager.cloud') }}</td>
-                                <td>-</td>
-                                <td>-</td>
-                                <td>-</td>
-                            </tr>
-                        @endif
-                        {{-- The Subfolders --}}
-                        @foreach ($subfolders as $path => $name)
-                            <tr>
-                                @if(isset($_GET['multi']))
-                                    <td>&nbsp;</td>
-                                @endif
-                                <td>
-                                    @php
-                                        $link = route('filemanager.picker') . "?folder=" . $path . $urlParams;
-                                    @endphp
-                                    <a href="{{ $link }}">
-                                        <i class="fa fa-folder"></i>
-                                        {{ $name }}
-                                    </a>
-                                </td>
-                                <td>{{ trans('filemanager::filemanager.folder') }}</td>
-                                <td>-</td>
-                                <td>-</td>
-                                <td>
-                                    <button type="button" class="btn btn-sm btn-danger"
-                                            onclick="delete_folder('{{ $name }}')">
-                                        <i class="fa fa-times-circle"></i>
-                                        {{ trans('filemanager::filemanager.delete') }}
-                                    </button>
-                                </td>
-                            </tr>
-                        @endforeach
-
-                        {{-- The Files --}}
-                        @foreach ($files as $file)
-                            <tr>
-                                @if(isset($_GET['multi']))
-                                    <td class="checkbox-label">
-                                        <label for="check{{ $file['id'] }}">
-                                            <input type="checkbox" name="files[]" id="check{{ $file['id'] }}"
-                                                   data-file-id="{{ $file['id'] }}" data-file-name="{{ $file['name'] }}">
-                                            <span class="sr-only">{{ trans('filemanager::filemanager.check') }}</span>
-                                        </label>
-                                    </td>
-                                @endif
-                                <td>
-                                    <a class="file" href="#" data-file-id="{{ $file['id'] }}"
-                                       data-file-name="{{ $file['name'] }}">
-                                        @if (is_image($file['mimeType']))
-                                            <i class="far fa-file-image"></i>
-                                        @else
-                                            <i class="far fa-file-alt"></i>
-                                        @endif
-                                        {{ $file['name'] }}
-                                    </a>
-                                </td>
-                                <td>{{ $file['mimeType'] ?? 'Unknown' }}</td>
-                                <td>{{ $file['modified']->format('j-M-y g:ia') }}</td>
-                                <td>{{ human_filesize($file['size']) }}</td>
-                                <td>
-                                    <button type="button" class="btn btn-sm btn-danger"
-                                            onclick="delete_file('{{ $file['name'] }}')">
-                                        <i class="fa fa-times-circle"></i>
-                                        {{ trans('filemanager::filemanager.delete') }}
-                                    </button>
-                                    @if (is_image($file['mimeType']))
-                                        <button type="button" class="btn btn-sm btn-success"
-                                                onclick="preview_image('{{ $file['webPath'] }}')">
-                                            <i class="fa fa-eye"></i>
-                                            {{ trans('filemanager::filemanager.preview') }}
-                                        </button>
+                        @if(!config('filemanager.jquery_datatables.use'))
+                             The Files
+                            @foreach ($files as $file)
+                                <tr>
+                                    @if(isset($_GET['multi']))
+                                        <td class="checkbox-label">
+                                            <label for="check{{ $file['id'] }}">
+                                                <input type="checkbox" name="files[]" id="check{{ $file['id'] }}"
+                                                       data-file-id="{{ $file['id'] }}"
+                                                       data-file-name="{{ $file['name'] }}">
+                                                <span class="sr-only">{{ trans('filemanager::filemanager.check') }}</span>
+                                            </label>
+                                        </td>
                                     @endif
-                                </td>
-                            </tr>
-                        @endforeach
-
+                                    <td>
+                                        <a class="file" href="#" data-file-id="{{ $file['id'] }}"
+                                           data-file-name="{{ $file['name'] }}">
+                                            @if (is_image($file['mimeType']))
+                                                <i class="far fa-file-image"></i>
+                                            @else
+                                                <i class="far fa-file-alt"></i>
+                                            @endif
+                                            {{ $file['name'] }}
+                                        </a>
+                                    </td>
+                                    <td class="mimeType">{{ $file['mimeType'] ?? 'Unknown' }}</td>
+                                    <td>{{ $file['time_taken']->format('j-M-y g:ia') }}</td>
+                                    <td>{{ human_filesize($file['size']) }}</td>
+                                    <td>
+                                        <button type="button"
+                                                class="btn btn-sm btn-danger btn-delete"
+                                                data-toggle="tooltip"
+                                                title="{{ trans('filemanager::filemanager.delete') }}"
+                                                data-name="{{ $file['name'] }}"
+                                        >
+                                            <i class="fa fa-times-circle"></i>
+                                        </button>
+                                        @if (is_image($file['mimeType']))
+                                            <button type="button"
+                                                    class="btn btn-sm btn-success btn-image"
+                                                    data-toggle="tooltip"
+                                                    title="{{ trans('filemanager::filemanager.preview') }}"
+                                                    data-path="{{ $file['webPath'] }}"
+                                            >
+                                                <i class="fa fa-eye"></i>
+                                            </button>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforeach
+                        @endif
                         </tbody>
                     </table>
                 </div>
@@ -256,22 +248,5 @@
 @stop
 
 @push(config('filemanager.javascript_section'))
-    <script>
-
-        // Confirm file delete
-        function delete_file(name) {
-            $("#delete-file-name1").html(name);
-            $("#delete-file-name2").val(name);
-            $("#modal-file-delete").modal("show");
-        }
-
-        // Confirm folder delete
-        function delete_folder(name) {
-            $("#delete-folder-name1").html(name);
-            $("#delete-folder-name2").val(name);
-            $("#modal-folder-delete").modal("show");
-        }
-
-    </script>
     @include('iemand002/filemanager::_pickerJs')
 @endpush

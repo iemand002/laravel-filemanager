@@ -5,8 +5,8 @@
 @endsection
 
 @push(config('filemanager.css_section'))
-    @if(config('filemanager.jquery_datatables.use') && config('filemanager.jquery_datatables.cdn'))
-        <link href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css" type="text/css"
+    @if(config('filemanager.jquery_datatables.cdn'))
+        <link href="https://cdn.datatables.net/2.2.2/css/dataTables.bootstrap5.css" type="text/css"
               rel="stylesheet">
     @endif
     <link href="{{ asset('vendor/iemand002/filemanager/css/filemanager.css') }}" rel="stylesheet" type="text/css">
@@ -15,9 +15,6 @@
 @section(config('filemanager.content_section'))
     @php
         $urlParams = '';
-        if (isset($_GET['CKEditor'])) {
-            $urlParams .= "&CKEditor=" . $_GET['CKEditor'] . "&CKEditorFuncNum=" . $_GET['CKEditorFuncNum'];
-        }
         if (isset($_GET['id'])) {
             $urlParams .= "&id=" . $_GET['id'];
         }
@@ -67,7 +64,7 @@
                     </button>
                 @endif
                 <button type="button" class="btn btn-primary btn-md"
-                        data-toggle="modal" data-target="#modal-file-upload">
+                        data-bs-toggle="modal" data-bs-target="#modal-file-upload">
                     <i class="fa fa-upload"></i> {{ trans('filemanager::filemanager.upload') }}
                 </button>
                 @if(is_dropbox_configured() && !is_dropbox_loggedIn())
@@ -87,8 +84,8 @@
 
         <div class="row">
             <div class="col-sm-12 col-md-3">
-                <button class="btn btn-primary d-md-none" type="button" data-toggle="collapse"
-                        data-target="#collapseFolders" aria-expanded="false" aria-controls="collapseFolders">
+                <button class="btn btn-primary d-md-none" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#collapseFolders" aria-expanded="false" aria-controls="collapseFolders">
                     {{ trans('filemanager::filemanager.folders') }}
                 </button>
                 <div class="collapse" id="collapseFolders">
@@ -131,11 +128,11 @@
                         @endforelse
                     </ul>
                     <button type="button" class="btn btn-success btn-sm"
-                            data-toggle="modal" data-target="#modal-folder-create">
+                            data-bs-toggle="modal" data-bs-target="#modal-folder-create">
                         <i class="fa fa-plus-circle"></i> {{ trans('filemanager::filemanager.new_folder') }}
                     </button>
                     <button type="button" class="btn btn-sm btn-danger"
-                            data-toggle="modal" data-target="#modal-folder-delete"
+                            data-bs-toggle="modal" data-bs-target="#modal-folder-delete"
                             data-folder="{{ $folderName }}">
                         <i class="fa fa-times-circle"></i>
                         {{ trans('filemanager::filemanager.delete') }}
@@ -147,7 +144,7 @@
                 @if(config('filemanager.alert_messages.picker'))
                     @if(Session::has('success'))
                         <div class="alert alert-success">
-                            <button type="button" class="close" data-dismiss="alert">×</button>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                             <strong>
                                 <i class="fa fa-check-circle"></i> {{ trans('filemanager::filemanager.success') }}
                             </strong>
@@ -156,7 +153,7 @@
                     @endif
                     @if($errors->any())
                         <div class="alert alert-danger">
-                            <button type="button" class="close" data-dismiss="alert">×</button>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                             <strong>{{ trans('filemanager::filemanager.whoops') }}</strong>
                             <ul class="list">
                                 @foreach($errors->all() as $error)

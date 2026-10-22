@@ -39,7 +39,8 @@
                         @php
                             $link = route('filemanager.pickerCloud','dropbox') . "?folder=&cloud=dropbox". $urlParams;
                         @endphp
-                        <li class="breadcrumb-item"><a href="{{ $link }}"><i class="fab fa-dropbox"></i> Dropbox</a></li>
+                        <li class="breadcrumb-item"><a href="{{ $link }}"><i class="fab fa-dropbox"></i> Dropbox</a>
+                        </li>
                         @for($i = 0; $i < sizeof($folder); $i++)
                             @if($folder[$i]!='')
                                 @php
@@ -66,17 +67,18 @@
 
         <div class="row">
             <div class="col-sm-12 col-md-3">
-                    <button class="btn btn-primary d-md-none" type="button" data-toggle="collapse" data-target="#collapseFolders" aria-expanded="false" aria-controls="collapseFolders">
-                        {{ trans('filemanager::filemanager.folders') }}
-                    </button>
-                    <div class="collapse" id="collapseFolders">
-                        <ul class="list-unstyled">
-                            {{-- The Subfolders --}}
-                            @php
-                                $noFolders = true;
-                            @endphp
-                            @foreach($data->entries as $entry)
-                                @if(!property_exists($entry, 'rev'))
+                <button class="btn btn-primary d-md-none" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#collapseFolders" aria-expanded="false" aria-controls="collapseFolders">
+                    {{ trans('filemanager::filemanager.folders') }}
+                </button>
+                <div class="collapse" id="collapseFolders">
+                    <ul class="list-unstyled">
+                        {{-- The Subfolders --}}
+                        @php
+                            $noFolders = true;
+                        @endphp
+                        @foreach($data->entries as $entry)
+                            @if(!property_exists($entry, 'rev'))
                                 <li>
                                     @php
                                         $link = route('filemanager.pickerCloud',['dropbox']) . "?folder=" . str_replace('%2F','/',rawurlencode(substr($entry->path_lower,1))) . '&cloud=dropbox'. $urlParams;
@@ -86,15 +88,15 @@
                                         {{ $entry->name }}
                                     </a>
                                 </li>
-                                @endif
-                            @endforeach
-                            @if($noFolders)
-                                <li>{{ trans('filemanager::filemanager.no_folders') }}</li>
                             @endif
-                        </ul>
-                    </div>
+                        @endforeach
+                        @if($noFolders)
+                            <li>{{ trans('filemanager::filemanager.no_folders') }}</li>
+                        @endif
+                    </ul>
                 </div>
-                <div class="col-sm-12 col-md-9">
+            </div>
+            <div class="col-sm-12 col-md-9">
 
                 <div class="table-responsive">
                     <table id="uploads-table" class="table table-striped table-bordered">
@@ -126,7 +128,8 @@
                                         <td class="checkbox-label">
                                             <label for="check{{ $loop->index }}">
                                                 <input type="checkbox" name="files[]" id="check{{ $loop->index }}"
-                                                       data-file-id="{{ $entry->id }}" data-file-name="{{ $entry->name }}"
+                                                       data-file-id="{{ $entry->id }}"
+                                                       data-file-name="{{ $entry->name }}"
                                                        data-file-date="{{ \Carbon\Carbon::createFromTimeString($entry->client_modified)->format('Y-m-d H:i:s') }}"
                                                        data-file-dimension="@if (isset($entry->media_info->metadata->dimensions)){{ $entry->media_info->metadata->dimensions->width }}x{{ $entry->media_info->metadata->dimensions->height }}@endif"
                                                        data-file-mime-type="{{ $mimeType }}"
@@ -156,7 +159,8 @@
                                     <td>
                                         @if (is_image($mimeType))
                                             <button type="button" class="btn btn-sm btn-success btn-image"
-                                                    data-toggle="tooltip" title="{{ trans('filemanager::filemanager.preview') }}"
+                                                    data-bs-toggle="tooltip"
+                                                    title="{{ trans('filemanager::filemanager.preview') }}"
                                                     data-path="{{ route('filemanager.getPicture',['provider'=>'dropbox', $entry->id]) }}">
                                                 <i class="fa fa-eye"></i>
                                             </button>
@@ -169,7 +173,6 @@
 
                         </tbody>
                     </table>
-                </div>
                 </div>
             </div>
         </div>

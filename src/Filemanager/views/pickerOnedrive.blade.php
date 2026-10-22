@@ -40,7 +40,8 @@
                             $link = route('filemanager.pickerCloud','onedrive') . "?folder=&cloud=onedrive". $urlParams;
                             $parent = explode('/',$data->value[0]->parentReference->path);
                         @endphp
-                        <li class="breadcrumb-item"><a href="{{ $link }}"><i class="fab fa-windows"></i> OneDrive</a></li>
+                        <li class="breadcrumb-item"><a href="{{ $link }}"><i class="fab fa-windows"></i> OneDrive</a>
+                        </li>
                         @php $foldersUrl = $foldersByName = '' @endphp
                         @foreach($folders as $folder)
                             @if($folder != '')
@@ -73,7 +74,8 @@
 
         <div class="row">
             <div class="col-sm-12 col-md-3">
-                <button class="btn btn-primary d-md-none" type="button" data-toggle="collapse" data-target="#collapseFolders" aria-expanded="false" aria-controls="collapseFolders">
+                <button class="btn btn-primary d-md-none" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#collapseFolders" aria-expanded="false" aria-controls="collapseFolders">
                     {{ trans('filemanager::filemanager.folders') }}
                 </button>
                 <div class="collapse" id="collapseFolders">
@@ -84,15 +86,15 @@
                         @endphp
                         @foreach($data->value as $entry)
                             @if(!property_exists($entry, 'file'))
-                            <li>
-                                @php
-                                    $link = route('filemanager.pickerCloud', ['onedrive']) . "?folder=" . ($foldersByName == '' ? $entry->name : $foldersByName . "/" . $entry->name) . "&folders=" . ($foldersUrl != '' ? $foldersUrl . '-' : '') . $entry->id . '&cloud=onedrive'. $urlParams;
-                                    $noFolders = false;
-                                @endphp
-                                <a href="{{$link}}">
-                                    {{ $entry->name }}
-                                </a>
-                            </li>
+                                <li>
+                                    @php
+                                        $link = route('filemanager.pickerCloud', ['onedrive']) . "?folder=" . ($foldersByName == '' ? $entry->name : $foldersByName . "/" . $entry->name) . "&folders=" . ($foldersUrl != '' ? $foldersUrl . '-' : '') . $entry->id . '&cloud=onedrive'. $urlParams;
+                                        $noFolders = false;
+                                    @endphp
+                                    <a href="{{$link}}">
+                                        {{ $entry->name }}
+                                    </a>
+                                </li>
                             @endif
                         @endforeach
                         @if($noFolders)
@@ -101,7 +103,7 @@
                     </ul>
                 </div>
             </div>
-                <div class="col-sm-12 col-md-9">
+            <div class="col-sm-12 col-md-9">
                 <div class="table-responsive">
                     <table id="uploads-table" class="table table-striped table-bordered">
                         <thead>
@@ -175,7 +177,6 @@
 
                         </tbody>
                     </table>
-                </div>
                 </div>
             </div>
         </div>

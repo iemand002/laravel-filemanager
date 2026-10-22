@@ -36,7 +36,6 @@ class SocialController extends Controller
             return Socialite::driver($provider)->scopes(['account_info.read', 'files.metadata.read', 'files.content.read'])->redirect();
         }
 
-
         return Socialite::driver($provider)->redirect();
     }
 

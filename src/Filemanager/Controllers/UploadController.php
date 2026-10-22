@@ -9,6 +9,8 @@ use Iemand002\Filemanager\Services\UploadsManager;
 
 use Iemand002\Filemanager\models\Uploads;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -67,7 +69,7 @@ class UploadController extends Controller
         return view('iemand002/filemanager::picker', $data);
     }
 
-    public function ajax(Request $request)
+    public function ajax(Request $request): bool|string
     {
         $folder = $request->get('folder');
         $rawData = $this->manager->folderInfoUploads($folder);
@@ -106,7 +108,7 @@ class UploadController extends Controller
      * @param string $folder
      * @return string
      */
-    public function sync($folder = '/')
+    public function sync(string $folder = '/'): string
     {
         $data = $this->manager->folderInfoDisk($folder);
 
@@ -129,7 +131,7 @@ class UploadController extends Controller
      * @param UploadNewFolderRequest $request
      * @return RedirectResponse
      */
-    public function createFolder(UploadNewFolderRequest $request)
+    public function createFolder(UploadNewFolderRequest $request): RedirectResponse
     {
         $folder = $request->get('new_folder');
         $path = $request->get('path');
@@ -154,7 +156,7 @@ class UploadController extends Controller
      * @param Request $request
      * @return RedirectResponse
      */
-    public function deleteFile(Request $request)
+    public function deleteFile(Request $request): RedirectResponse
     {
         $del_file = $request->get('del_file');
         $result = $this->delFromDb($del_file, Str::finish($request->get('folder'), '/'));
@@ -182,7 +184,7 @@ class UploadController extends Controller
      * @param Request $request
      * @return RedirectResponse
      */
-    public function deleteFolder(Request $request)
+    public function deleteFolder(Request $request): RedirectResponse
     {
         $path = $request->get('path');
         $del_folder = substr($path, strrpos($path, '/') + 1);
@@ -216,7 +218,7 @@ class UploadController extends Controller
      * @return JsonResponse|RedirectResponse
      * @throws FileNotFoundException
      */
-    public function uploadFile(UploadFileRequest $request)
+    public function uploadFile(UploadFileRequest $request): JsonResponse|RedirectResponse
     {
         $file = $_FILES['file'];
         $file_parts = pathinfo($file['name']);
@@ -300,8 +302,9 @@ class UploadController extends Controller
      *
      * @param $fileName
      * @param $folder
+     * @return array|Application|Translator|string|true|null
      */
-    private function delFromDb($fileName, $folder)
+    private function delFromDb($fileName, $folder): bool|array|string|Translator|Application|null
     {
         try {
             Uploads::where('filename', $fileName)->where('folder', $folder)->delete();

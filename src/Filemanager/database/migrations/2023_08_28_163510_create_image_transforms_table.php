@@ -5,13 +5,13 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Schema;
 
-class CreateImageTransformsTable extends Migration
+return new class extends Migration
 {
-    protected $table;
+    protected mixed $table;
     /**
      * @var mixed
      */
-    private $uploadsTable;
+    private mixed $uploadsTable;
 
     public function __construct()
     {
@@ -23,7 +23,7 @@ class CreateImageTransformsTable extends Migration
      * Run the migrations.
      *
      */
-    public function up()
+    public function up(): void
     {
         if (!Schema::hasTable($this->table)) {
             Schema::create($this->table, function (Blueprint $table) {
@@ -38,7 +38,7 @@ class CreateImageTransformsTable extends Migration
                 $table->string('dimension')->nullable();
                 $table->timestamps();
             });
-            Schema::table($this->table, function(Blueprint $table) {
+            Schema::table($this->table, function (Blueprint $table) {
                 $table->foreign('upload_id')->references('id')->on($this->uploadsTable)
                     ->onDelete('restrict')
                     ->onUpdate('restrict');
@@ -50,13 +50,13 @@ class CreateImageTransformsTable extends Migration
      * Reverse the migrations.
      *
      */
-    public function down()
+    public function down(): void
     {
         if (Schema::hasTable($this->table)) {
-            Schema::table($this->table, function(Blueprint $table) {
+            Schema::table($this->table, function (Blueprint $table) {
                 $table->dropForeign($this->table . '_upload_id_foreign');
             });
             Schema::drop($this->table);
         }
     }
-}
+};

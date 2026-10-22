@@ -22,11 +22,11 @@ class UploadsManager
     /**
      * @var string
      */
-    private $tempFolder;
+    private string $tempFolder;
     /**
      * @var Repository|Application|mixed
      */
-    private $library;
+    private mixed $library;
     /**
      * @var Repository|Application|mixed
      */
@@ -34,7 +34,7 @@ class UploadsManager
     /**
      * @var ImageManager
      */
-    private $intervention;
+    private ImageManager $intervention;
 
     /**
      * UploadsManager constructor.
@@ -270,7 +270,7 @@ class UploadsManager
      * @param $path
      * @return Application|array|bool|string|Translator|null
      */
-    public function createDirectory($folder, $path)
+    public function createDirectory($folder, $path): bool|array|string|Translator|Application|null
     {
         $folder = Str::slug($this->cleanFolder($folder));
         $path = $path . '/' . $folder;
@@ -288,7 +288,7 @@ class UploadsManager
      * @param $folder
      * @return array|bool|Application|Translator|string|null
      */
-    public function deleteDirectory($folder)
+    public function deleteDirectory($folder): bool|array|string|Translator|Application|null
     {
         $folder = $this->cleanFolder($folder);
 
@@ -309,7 +309,7 @@ class UploadsManager
      * @param $path
      * @return Application|array|bool|string|Translator|null
      */
-    public function deleteFile($path)
+    public function deleteFile($path): bool|array|string|Translator|Application|null
     {
         $path = $this->cleanFolder($path);
 
@@ -327,7 +327,7 @@ class UploadsManager
      * @param $content
      * @return Application|array|bool|string|Translator|null
      */
-    public function saveFile($path, $content)
+    public function saveFile($path, $content): bool|array|string|Translator|Application|null
     {
         $path = $this->cleanFolder($path);
 
@@ -342,7 +342,7 @@ class UploadsManager
      * Resize file to create thumbnail.
      *
      * @access public
-     * @param string $originalFilepath
+     * @param string $originalFile
      * @param string $targetFilepath
      * @param Uploads $upload
      * @param array $transform
@@ -354,7 +354,7 @@ class UploadsManager
         Uploads      $upload,
         array        $transform,
         string       $transformHandle
-    )
+    ): void
     {
         list($width, $height, $squared, $quality) = $transform;
 
@@ -390,7 +390,7 @@ class UploadsManager
         }
     }
 
-    private function saveTransformToDb($image, $transformHandle, $upload)
+    private function saveTransformToDb($image, $transformHandle, $upload): void
     {
         $transform = new Transforms();
         $transform->transform = $transformHandle;
@@ -402,7 +402,7 @@ class UploadsManager
     /**
      * Remove the temporary created folder and files
      */
-    private function removeTemp()
+    private function removeTemp(): void
     {
 //        $it = new RecursiveDirectoryIterator($this->tempFolder, RecursiveDirectoryIterator::SKIP_DOTS);
 //        $files = new RecursiveIteratorIterator($it,

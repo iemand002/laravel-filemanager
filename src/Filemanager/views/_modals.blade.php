@@ -8,8 +8,7 @@
                 <input type="hidden" name="path" value="{{ $folder }}">
                 <div class="modal-header">
                     <h5 class="modal-title">{{ trans('filemanager::filemanager.create') }} {{ trans('filemanager::filemanager.new_folder') }}</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="{{ trans('filemanager::filemanager.close') }}">
-                        <span aria-hidden="true">&times;</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ trans('filemanager::filemanager.close') }}">
                     </button>
                 </div>
                 <div class="modal-body">
@@ -24,7 +23,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-light" data-dismiss="modal" aria-label="{{ trans('filemanager::filemanager.cancel') }}">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal" aria-label="{{ trans('filemanager::filemanager.cancel') }}">
                         {{ trans('filemanager::filemanager.cancel') }}
                     </button>
                     <button type="submit" class="btn btn-primary">
@@ -42,8 +41,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">{{ trans('filemanager::filemanager.please_confirm') }}</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="{{ trans('filemanager::filemanager.close') }}">
-                    <span aria-hidden="true">&times;</span>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ trans('filemanager::filemanager.close') }}">
                 </button>
             </div>
             <div class="modal-body">
@@ -60,7 +58,7 @@
                     <input type="hidden" name="_method" value="DELETE">
                     <input type="hidden" name="folder" value="{{ $folder }}">
                     <input type="hidden" name="del_file" id="delete-file-name2">
-                    <button type="button" class="btn btn-light" data-dismiss="modal" aria-label="{{ trans('filemanager::filemanager.cancel') }}">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal" aria-label="{{ trans('filemanager::filemanager.cancel') }}">
                         {{ trans('filemanager::filemanager.cancel') }}
                     </button>
                     <button type="submit" class="btn btn-danger">
@@ -78,8 +76,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">{{ trans('filemanager::filemanager.please_confirm') }}</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="{{ trans('filemanager::filemanager.close') }}">
-                    <span aria-hidden="true">&times;</span>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ trans('filemanager::filemanager.close') }}">
                 </button>
             </div>
             <div class="modal-body">
@@ -95,7 +92,7 @@
                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
                     <input type="hidden" name="_method" value="DELETE">
                     <input type="hidden" name="path" value="{{ $folder }}">
-                    <button type="button" class="btn btn-light" data-dismiss="modal" aria-label="{{ trans('filemanager::filemanager.cancel') }}">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal" aria-label="{{ trans('filemanager::filemanager.cancel') }}">
                         {{ trans('filemanager::filemanager.cancel') }}
                     </button>
                     <button type="submit" class="btn btn-danger">
@@ -117,8 +114,7 @@
                 <input type="hidden" name="folder" value="{{ $folder }}">
                 <div class="modal-header">
                     <h5 class="modal-title">{{ trans('filemanager::filemanager.upload') }} {{ trans('filemanager::filemanager.new_file') }}</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="{{ trans('filemanager::filemanager.close') }}">
-                        <span aria-hidden="true">&times;</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ trans('filemanager::filemanager.close') }}">
                     </button>
                 </div>
                 <div class="modal-body">
@@ -127,10 +123,7 @@
                             {{ trans('filemanager::filemanager.file') }}
                         </label>
                         <div class="col-sm-9">
-                            <div class="custom-file">
-                                <input type="file" class="custom-file-input" id="file" name="file">
-                                <label class="custom-file-label" for="customFile">{{ trans('filemanager::filemanager.choose_file') }}</label>
-                            </div>
+                            <input type="file" class="form-control" id="file" name="file">
                         </div>
                     </div>
                     <div class="form-group row">
@@ -144,7 +137,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-light" data-dismiss="modal" aria-label="{{ trans('filemanager::filemanager.cancel') }}">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal" aria-label="{{ trans('filemanager::filemanager.cancel') }}">
                         {{ trans('filemanager::filemanager.cancel') }}
                     </button>
                     <button type="submit" class="btn btn-primary">
@@ -155,12 +148,3 @@
         </div>
     </div>
 </div>
-
-@push(config('filemanager.javascript_section'))
-    <script src="https://cdn.jsdelivr.net/npm/bs-custom-file-input/dist/bs-custom-file-input.min.js"></script>
-    <script>
-        $(document).ready(function () {
-            bsCustomFileInput.init()
-        })
-    </script>
-@endpush

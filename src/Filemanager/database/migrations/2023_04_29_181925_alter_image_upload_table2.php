@@ -4,13 +4,13 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AlterImageUploadTable extends Migration
+return new class extends Migration
 {
     protected $table;
 
     public function __construct()
     {
-        $this->table = config('filemanager.table','uploads');
+        $this->table = config('filemanager.table', 'uploads');
     }
 
     /**
@@ -34,8 +34,8 @@ class AlterImageUploadTable extends Migration
     {
         if (Schema::hasTable($this->table)) {
             Schema::table($this->table, function (Blueprint $table) {
-               $table->dropColumn('size');
+                $table->dropColumn('size');
             });
         }
     }
-}
+};

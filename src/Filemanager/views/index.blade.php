@@ -5,8 +5,8 @@
 @endsection
 
 @push(config('filemanager.css_section'))
-    @if(config('filemanager.jquery_datatables.use') && config('filemanager.jquery_datatables.cdn'))
-        <link href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css" type="text/css"
+    @if(config('filemanager.jquery_datatables.cdn'))
+        <link href="https://cdn.datatables.net/2.2.2/css/dataTables.bootstrap5.css" type="text/css"
               rel="stylesheet">
     @endif
     <link href="{{ asset('vendor/iemand002/filemanager/css/filemanager.css') }}" rel="stylesheet" type="text/css">
@@ -47,7 +47,7 @@
                 </div>
                 <div class="col-md-6 text-right">
                     <button type="button" class="btn btn-primary btn-md"
-                            data-toggle="modal" data-target="#modal-file-upload">
+                            data-bs-toggle="modal" data-bs-target="#modal-file-upload">
                         <i class="fa fa-upload"></i> {{ trans('filemanager::filemanager.upload') }}
                     </button>
                     @if(is_dropbox_configured() && !is_dropbox_loggedIn())
@@ -67,8 +67,8 @@
 
             <div class="row">
                 <div class="col-sm-12 col-md-3">
-                    <button class="btn btn-primary d-md-none" type="button" data-toggle="collapse"
-                            data-target="#collapseFolders" aria-expanded="false" aria-controls="collapseFolders">
+                    <button class="btn btn-primary d-md-none" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseFolders" aria-expanded="false" aria-controls="collapseFolders">
                         {{ trans('filemanager::filemanager.folders') }}
                     </button>
                     <div class="collapse" id="collapseFolders">
@@ -97,7 +97,7 @@
                                 @endif
                             @endif
                             {{-- The Subfolders --}}
-                            @forelse ($subfolders as $path => $name)
+                            @forelse ($subFolders as $path => $name)
                                 <li>
                                     @php
                                         $link = route('filemanager.index') . "?folder=" . $path;
@@ -111,11 +111,11 @@
                             @endforelse
                         </ul>
                         <button type="button" class="btn btn-success btn-sm"
-                                data-toggle="modal" data-target="#modal-folder-create">
+                                data-bs-toggle="modal" data-bs-target="#modal-folder-create">
                             <i class="fa fa-plus-circle"></i> {{ trans('filemanager::filemanager.new_folder') }}
                         </button>
                         <button type="button" class="btn btn-sm btn-danger"
-                                data-toggle="modal" data-target="#modal-folder-delete"
+                                data-bs-toggle="modal" data-bs-target="#modal-folder-delete"
                         >
                             <i class="fa fa-times-circle"></i>
                             {{ trans('filemanager::filemanager.delete_folder') }}
@@ -125,23 +125,23 @@
                 <div class="col-sm-12 col-md-9">
                     @if(config('filemanager.alert_messages.normal'))
                         @if(Session::has('success'))
-                            <div class="alert alert-success">
-                                <button type="button" class="close" data-dismiss="alert">×</button>
+                            <div class="alert alert-success alert-dismissible">
                                 <strong>
                                     <i class="fa fa-check-circle"></i> {{ trans('filemanager::filemanager.success') }}
                                 </strong>
                                 {{ Session::get('success') }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                             </div>
                         @endif
                         @if($errors->any())
-                            <div class="alert alert-danger">
-                                <button type="button" class="close" data-dismiss="alert">×</button>
+                            <div class="alert alert-danger alert-dismissible">
                                 <strong>{{ trans('filemanager::filemanager.whoops') }}</strong>
                                 <ul class="list">
                                     @foreach($errors->all() as $error)
                                         <li>{{ $error }}</li>
                                     @endforeach
                                 </ul>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                             </div>
                         @endif
                     @endif
@@ -158,46 +158,6 @@
                             </tr>
                             </thead>
                             <tbody>
-
-                            {{-- The Files --}}
-{{--                            @foreach ($files as $file)--}}
-{{--                                <tr>--}}
-{{--                                    <td>--}}
-{{--                                        <a href="{{ $file['webPath'] }}">--}}
-{{--                                            @if (is_image($file['mimeType']))--}}
-{{--                                                <i class="far fa-file-image"></i>--}}
-{{--                                            @else--}}
-{{--                                                <i class="far fa-file-alt"></i>--}}
-{{--                                            @endif--}}
-{{--                                            {{ $file['name'] }}--}}
-{{--                                        </a>--}}
-{{--                                    </td>--}}
-{{--                                    <td class="mimeType">{{ $file['mimeType'] ?? 'Unknown' }}</td>--}}
-{{--                                    <td>{{ $file['time_taken']->format('j-M-y g:ia') }}</td>--}}
-{{--                                    <td>{{ human_filesize($file['size']) }}</td>--}}
-{{--                                    <td>--}}
-{{--                                        <button type="button"--}}
-{{--                                                class="btn btn-sm btn-danger btn-delete"--}}
-{{--                                                data-toggle="tooltip"--}}
-{{--                                                title="{{ trans('filemanager::filemanager.delete') }}"--}}
-{{--                                                data-name="{{ $file['name'] }}"--}}
-{{--                                        >--}}
-{{--                                            <i class="fa fa-times-circle"></i>--}}
-{{--                                        </button>--}}
-{{--                                        @if (is_image($file['mimeType']))--}}
-{{--                                            <button type="button"--}}
-{{--                                                    class="btn btn-sm btn-success btn-image"--}}
-{{--                                                    data-toggle="tooltip"--}}
-{{--                                                    title="{{ trans('filemanager::filemanager.preview') }}"--}}
-{{--                                                    data-path="{{ $file['webPath'] }}"--}}
-{{--                                            >--}}
-{{--                                                <i class="fa fa-eye"></i>--}}
-{{--                                            </button>--}}
-{{--                                        @endif--}}
-{{--                                    </td>--}}
-{{--                                </tr>--}}
-{{--                            @endforeach--}}
-
                             </tbody>
                         </table>
                     </div>
